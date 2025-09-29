@@ -4,6 +4,7 @@ import {
   CampaignOutputType,
   campaignOutputZodSchema,
 } from './campaign-generator.types';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class CampaignGeneratorService implements OnModuleInit {
@@ -39,5 +40,31 @@ export class CampaignGeneratorService implements OnModuleInit {
     this.logger.log(`Generating campaign for prompt: ${prompt}`);
     const result = await run(this.campaignGeneratorAgent, prompt);
     return result.finalOutput as CampaignOutputType;
+  }
+
+  generateCampaignStream(prompt: string): Observable<any> {
+    this.logger.log(`Generating streaming campaign for prompt: ${prompt}`);
+
+    return new Observable((observer) => {
+      const runStream = async () => {
+        try {
+          const stream = await run(this.campaignGeneratorAgent, prompt, {
+            stream: true,
+          });
+
+          const textStream = stream.toTextStream();
+
+          for await (const chunk of textStream) {
+            observer.next({ data: chunk });
+          }
+
+          observer.complete();
+        } catch (error) {
+          observer.error(error);
+        }
+      };
+
+      runStream();
+    });
   }
 }
