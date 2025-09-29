@@ -6,6 +6,9 @@ import { envSchema } from './config/env.zod';
 import { AgentModule } from './agent/agent.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfigService } from './config/config.service';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -16,23 +19,10 @@ import { AppConfigService } from './config/config.service';
         return envSchema.parse(config);
       },
     }),
-    TypeOrmModule.forRootAsync({
-      useFactory: (configService: AppConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_NAME'),
-        synchronize: true, // Set to false in production
-        logging: configService.get('NODE_ENV') === 'development',
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        autoLoadEntities: true,
-      }),
-      imports: [ConfigModule],
-      inject: [ConfigService],
-    }),
     AgentModule,
+    AuthModule,
+    UserModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

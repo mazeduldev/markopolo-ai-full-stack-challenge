@@ -27,7 +27,14 @@ export const campaignOutputZodSchema = z.object({
       'The marketing channels to be used for the campaign (e.g., email, sms, push, whatsapp, etc.)',
     ),
   timeline: z
-    .string()
+    .object({
+      start_date: z
+        .string()
+        .describe('The start date of the campaign (YYYY-MM-DD)'),
+      end_date: z
+        .string()
+        .describe('The end date of the campaign (YYYY-MM-DD)'),
+    })
     .describe('The timeline for the campaign, including start and end dates'),
   budget: z.string().describe('The budget allocated for the campaign'),
   expected_metrics: z
