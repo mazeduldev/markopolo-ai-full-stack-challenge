@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { ChatThread } from './chat-thread.entity';
+import { ChatThread } from '../database/entities/chat-thread.entity';
 
 export enum MessageRole {
   USER = 'user',

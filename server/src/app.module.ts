@@ -7,6 +7,7 @@ import { AgentModule } from './agent/agent.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { DatabaseModule } from './database/database.module';
     AuthModule,
     UserModule,
     DatabaseModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

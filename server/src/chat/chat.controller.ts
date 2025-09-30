@@ -1,9 +1,9 @@
 import { Body, Controller, Logger, Post, Sse, UsePipes } from '@nestjs/common';
-import { CampaignGeneratorService } from './campaign-generator.service';
-import { type MessageDto, messageZodSchema } from './chat.types';
+import type { Observable } from 'rxjs';
+import type { CampaignGeneratorService } from 'src/agent/campaign-generator.service';
+import type { CampaignOutputType } from 'src/agent/campaign-generator.types';
 import { ZodPipe } from 'src/pipes/zod.pipe';
-import { Observable } from 'rxjs';
-import { CampaignOutputType } from './campaign-generator.types';
+import { type MessageDto, messageZodSchema } from './chat.types';
 
 @Controller('chat')
 export class ChatController {

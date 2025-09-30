@@ -3,8 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CampaignChannel } from './entities/campaign-channel.entity';
 import { Campaign } from './entities/campaign.entity';
-import { ChatMessage } from './entities/chat-message.entity';
-import { ChatThread } from './entities/chat-thread.entity';
+import { ChatMessage } from '../chat/chat-message.entity';
+import { ChatThread } from '../chat/chat-thread.entity';
 import { DataSourceConnection } from './entities/data-source-connection.entity';
 import type { Env } from 'src/config/env.zod';
 
@@ -25,13 +25,7 @@ import type { Env } from 'src/config/env.zod';
       imports: [ConfigModule],
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([
-      Campaign,
-      CampaignChannel,
-      ChatThread,
-      ChatMessage,
-      DataSourceConnection,
-    ]),
+    TypeOrmModule.forFeature([Campaign, CampaignChannel, DataSourceConnection]),
   ],
   exports: [TypeOrmModule],
 })
