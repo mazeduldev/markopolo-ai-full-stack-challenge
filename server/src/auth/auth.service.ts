@@ -10,18 +10,18 @@ import {
   userMinimalZodSchema,
 } from './auth.types';
 import { JwtService } from '@nestjs/jwt';
-import type { AppConfigService } from 'src/config/config.service';
 import { Repository } from 'typeorm';
 import { UserSecret } from 'src/database/entities/user-secret.entity';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import type { Env } from 'src/config/env.zod';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<Env>,
     @InjectRepository(UserSecret)
     private readonly userSecretRepository: Repository<UserSecret>,
   ) {}
