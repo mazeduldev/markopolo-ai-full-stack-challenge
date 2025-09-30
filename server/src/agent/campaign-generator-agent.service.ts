@@ -7,8 +7,8 @@ import {
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class CampaignGeneratorService implements OnModuleInit {
-  private readonly logger = new Logger(CampaignGeneratorService.name);
+export class CampaignGeneratorAgentService implements OnModuleInit {
+  private readonly logger = new Logger(CampaignGeneratorAgentService.name);
 
   private campaignGeneratorAgent: Agent<
     unknown,

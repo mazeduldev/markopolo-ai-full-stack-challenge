@@ -1,4 +1,3 @@
-// apps/campaign-backend/src/entities/chat-message.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,7 +7,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { ChatThread } from '../database/entities/chat-thread.entity';
+import { ChatThread } from './chat-thread.entity';
 
 export enum MessageRole {
   USER = 'user',

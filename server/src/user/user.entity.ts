@@ -1,4 +1,4 @@
-import { Campaign } from 'src/database/entities/campaign.entity';
+import { Campaign } from 'src/campaign/campaign.entity';
 import { ChatThread } from 'src/chat/chat-thread.entity';
 import { DataSourceConnection } from 'src/database/entities/data-source-connection.entity';
 import { Secret } from 'src/auth/secret.entity';

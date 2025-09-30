@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { CampaignGeneratorService } from './campaign-generator.service';
+import { CampaignGeneratorAgentService } from './campaign-generator-agent.service';
 
 @Module({
   imports: [ConfigModule],
-  providers: [CampaignGeneratorService],
+  providers: [CampaignGeneratorAgentService],
+  exports: [CampaignGeneratorAgentService],
 })
 export class AgentModule {}

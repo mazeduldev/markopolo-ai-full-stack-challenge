@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { envSchema } from './config/env.zod';
 import { AgentModule } from './agent/agent.module';
@@ -8,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
 import { ChatModule } from './chat/chat.module';
+import { CampaignModule } from './campaign/campaign.module';
 
 @Module({
   imports: [
@@ -23,8 +23,8 @@ import { ChatModule } from './chat/chat.module';
     UserModule,
     DatabaseModule,
     ChatModule,
+    CampaignModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

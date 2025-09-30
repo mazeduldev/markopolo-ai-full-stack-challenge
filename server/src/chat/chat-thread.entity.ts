@@ -1,4 +1,3 @@
-// apps/campaign-backend/src/entities/chat-thread.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,

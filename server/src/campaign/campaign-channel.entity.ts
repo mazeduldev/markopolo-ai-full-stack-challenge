@@ -1,4 +1,3 @@
-// apps/campaign-backend/src/entities/campaign-channel.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,

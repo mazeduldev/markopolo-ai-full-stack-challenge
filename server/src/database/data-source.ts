@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
-import { CampaignChannel } from './entities/campaign-channel.entity';
-import { Campaign } from './entities/campaign.entity';
+import { CampaignChannel } from '../campaign/campaign-channel.entity';
+import { Campaign } from '../campaign/campaign.entity';
 import { ChatMessage } from '../chat/chat-message.entity';
 import { ChatThread } from '../chat/chat-thread.entity';
 import { DataSourceConnection } from './entities/data-source-connection.entity';

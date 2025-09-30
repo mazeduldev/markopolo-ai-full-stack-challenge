@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserModule } from 'src/user/user.module';
-import { DatabaseModule } from 'src/database/database.module';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './passport/local.strategy';
 import { LocalAuthGuard } from './passport/local-auth.guard';
@@ -12,12 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Secret } from './secret.entity';
 
 @Module({
-  imports: [
-    UserModule,
-    JwtModule,
-    DatabaseModule,
-    TypeOrmModule.forFeature([Secret]),
-  ],
+  imports: [UserModule, JwtModule, TypeOrmModule.forFeature([Secret])],
   providers: [
     AuthService,
     LocalStrategy,
