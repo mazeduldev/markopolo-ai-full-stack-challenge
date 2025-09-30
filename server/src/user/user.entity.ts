@@ -26,6 +26,8 @@ export class User {
   })
   @JoinColumn({ name: 'secret_id' })
   secret: Secret;
+
+  @Column()
   secret_id: string;
 
   @Column()

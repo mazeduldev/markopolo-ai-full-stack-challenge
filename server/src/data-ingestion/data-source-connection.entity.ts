@@ -8,19 +8,10 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from 'src/user/user.entity';
-
-export enum DataSourceType {
-  SHOPIFY = 'shopify',
-  GOOGLE_ADS = 'google_ads',
-  WEBSITE_ANALYTICS = 'website_analytics',
-}
-
-export enum ConnectionStatus {
-  CONNECTED = 'connected',
-  DISCONNECTED = 'disconnected',
-  ERROR = 'error',
-  PENDING = 'pending',
-}
+import {
+  ConnectionStatus,
+  DataSourceType,
+} from './data-source-connection.type';
 
 @Entity('data_source_connections')
 export class DataSourceConnection {
@@ -36,7 +27,7 @@ export class DataSourceConnection {
   @Column({
     type: 'enum',
     enum: ConnectionStatus,
-    default: ConnectionStatus.PENDING,
+    default: ConnectionStatus.CONNECTED,
   })
   status: ConnectionStatus;
 
@@ -67,7 +58,9 @@ export class DataSourceConnection {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.data_source_connections)
+  @ManyToOne(() => User, (user) => user.data_source_connections, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
