@@ -8,8 +8,8 @@ import {
 } from 'typeorm';
 import { User } from 'src/user/user.entity';
 
-@Entity('user_secrets')
-export class UserSecret {
+@Entity('secrets')
+export class Secret {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -22,6 +22,6 @@ export class UserSecret {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToOne(() => User, (user) => user.user_secret)
+  @OneToOne(() => User, (user) => user.secret)
   user: User;
 }

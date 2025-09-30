@@ -1,7 +1,7 @@
 import { Campaign } from 'src/database/entities/campaign.entity';
 import { ChatThread } from 'src/database/entities/chat-thread.entity';
 import { DataSourceConnection } from 'src/database/entities/data-source-connection.entity';
-import { UserSecret } from 'src/database/entities/user-secret.entity';
+import { Secret } from 'src/auth/secret.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -21,12 +21,12 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @OneToOne(() => UserSecret, (userSecret) => userSecret.user, {
+  @OneToOne(() => Secret, (secret) => secret.user, {
     cascade: true,
   })
-  @JoinColumn({ name: 'user_secret_id' })
-  user_secret: UserSecret;
-  user_secret_id: string;
+  @JoinColumn({ name: 'secret_id' })
+  secret: Secret;
+  secret_id: string;
 
   @Column()
   name: string;

@@ -6,7 +6,6 @@ import { Campaign } from './entities/campaign.entity';
 import { ChatMessage } from './entities/chat-message.entity';
 import { ChatThread } from './entities/chat-thread.entity';
 import { DataSourceConnection } from './entities/data-source-connection.entity';
-import { UserSecret } from './entities/user-secret.entity';
 import type { Env } from 'src/config/env.zod';
 
 @Module({
@@ -27,7 +26,6 @@ import type { Env } from 'src/config/env.zod';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([
-      UserSecret,
       Campaign,
       CampaignChannel,
       ChatThread,

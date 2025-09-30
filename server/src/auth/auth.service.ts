@@ -11,7 +11,7 @@ import {
 } from './auth.types';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
-import { UserSecret } from 'src/database/entities/user-secret.entity';
+import { Secret } from 'src/auth/secret.entity';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Env } from 'src/config/env.zod';
@@ -22,14 +22,14 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<Env>,
-    @InjectRepository(UserSecret)
-    private readonly userSecretRepository: Repository<UserSecret>,
+    @InjectRepository(Secret)
+    private readonly userSecretRepository: Repository<Secret>,
   ) {}
 
   async validateUserCredentials(email: string, password: string) {
     const user = await this.userService.findOne({
       where: { email },
-      relations: ['user_secret'],
+      relations: ['secret'],
     });
 
     if (!user) {
@@ -38,7 +38,7 @@ export class AuthService {
 
     const isPasswordValid = await bcrypt.compare(
       password,
-      user.user_secret.password_hash,
+      user.secret.password_hash,
     );
 
     return isPasswordValid ? userMinimalZodSchema.parse(user) : null;
@@ -65,7 +65,7 @@ export class AuthService {
       user: newUser,
     });
 
-    newUser.user_secret = userSecret;
+    newUser.secret = userSecret;
     await this.userService.save(newUser);
 
     return this.login(newUser);

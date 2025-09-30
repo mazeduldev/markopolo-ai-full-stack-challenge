@@ -1,4 +1,3 @@
-// apps/campaign-backend/src/database/data-source.ts
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 import { CampaignChannel } from './entities/campaign-channel.entity';
@@ -6,7 +5,7 @@ import { Campaign } from './entities/campaign.entity';
 import { ChatMessage } from './entities/chat-message.entity';
 import { ChatThread } from './entities/chat-thread.entity';
 import { DataSourceConnection } from './entities/data-source-connection.entity';
-import { UserSecret } from './entities/user-secret.entity';
+import { Secret } from '../auth/secret.entity';
 import { User } from 'src/user/user.entity';
 
 config(); // Load .env file
@@ -21,7 +20,7 @@ export const AppDataSource = new DataSource({
   logging: process.env.NODE_ENV === 'development',
   entities: [
     User,
-    UserSecret,
+    Secret,
     Campaign,
     CampaignChannel,
     ChatThread,
