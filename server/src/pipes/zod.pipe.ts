@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { ZodError, ZodSchema } from 'zod';
 
-export class ZodValidationPipe implements PipeTransform {
+export class ZodPipe implements PipeTransform {
   constructor(private schema: ZodSchema) {}
 
   transform(value: unknown, metadata: ArgumentMetadata) {

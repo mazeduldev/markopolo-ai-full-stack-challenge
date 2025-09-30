@@ -1,7 +1,7 @@
 import { Body, Controller, Logger, Post, Sse, UsePipes } from '@nestjs/common';
 import { CampaignGeneratorService } from './campaign-generator.service';
 import { type MessageDto, messageZodSchema } from './chat.types';
-import { ZodValidationPipe } from 'src/pipes/zod_validation.pipe';
+import { ZodPipe } from 'src/pipes/zod.pipe';
 import { Observable } from 'rxjs';
 import { CampaignOutputType } from './campaign-generator.types';
 
@@ -14,7 +14,7 @@ export class ChatController {
   ) {}
 
   @Post()
-  @UsePipes(new ZodValidationPipe(messageZodSchema))
+  @UsePipes(new ZodPipe(messageZodSchema))
   async generateCampaign(
     @Body() body: MessageDto,
   ): Promise<CampaignOutputType> {
@@ -26,7 +26,7 @@ export class ChatController {
 
   @Post('stream')
   @Sse('stream')
-  @UsePipes(new ZodValidationPipe(messageZodSchema))
+  @UsePipes(new ZodPipe(messageZodSchema))
   generateCampaignStream(
     @Body() body: MessageDto,
   ): Observable<CampaignOutputType> {
