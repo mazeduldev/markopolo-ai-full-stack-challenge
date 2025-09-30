@@ -7,6 +7,7 @@ import { ChatMessage } from './entities/chat-message.entity';
 import { ChatThread } from './entities/chat-thread.entity';
 import { DataSourceConnection } from './entities/data-source-connection.entity';
 import { User } from './entities/user.entity';
+import { UserSecret } from './entities/user-secret.entity';
 
 config(); // Load .env file
 
@@ -20,6 +21,7 @@ export const AppDataSource = new DataSource({
   logging: process.env.NODE_ENV === 'development',
   entities: [
     User,
+    UserSecret,
     Campaign,
     CampaignChannel,
     ChatThread,

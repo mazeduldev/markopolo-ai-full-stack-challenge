@@ -8,6 +8,7 @@ import { Campaign } from './entities/campaign.entity';
 import { ChatMessage } from './entities/chat-message.entity';
 import { ChatThread } from './entities/chat-thread.entity';
 import { DataSourceConnection } from './entities/data-source-connection.entity';
+import { UserSecret } from './entities/user-secret.entity';
 
 @Module({
   imports: [
@@ -19,14 +20,6 @@ import { DataSourceConnection } from './entities/data-source-connection.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [
-          User,
-          Campaign,
-          CampaignChannel,
-          ChatThread,
-          ChatMessage,
-          DataSourceConnection,
-        ],
         autoLoadEntities: true,
         synchronize: configService.get('NODE_ENV') === 'development',
         logging: configService.get('NODE_ENV') === 'development',
@@ -36,6 +29,7 @@ import { DataSourceConnection } from './entities/data-source-connection.entity';
     }),
     TypeOrmModule.forFeature([
       User,
+      UserSecret,
       Campaign,
       CampaignChannel,
       ChatThread,

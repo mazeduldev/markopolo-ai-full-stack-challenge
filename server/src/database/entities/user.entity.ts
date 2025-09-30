@@ -5,10 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Campaign } from './campaign.entity';
 import { ChatThread } from './chat-thread.entity';
 import { DataSourceConnection } from './data-source-connection.entity';
+import { UserSecret } from './user-secret.entity';
 
 @Entity('users')
 export class User {
@@ -17,6 +20,13 @@ export class User {
 
   @Column({ unique: true })
   email: string;
+
+  @OneToOne(() => UserSecret, (userSecret) => userSecret.user, {
+    cascade: true,
+  })
+  @JoinColumn({ name: 'user_secret_id' })
+  user_secret: UserSecret;
+  user_secret_id: string;
 
   @Column()
   name: string;

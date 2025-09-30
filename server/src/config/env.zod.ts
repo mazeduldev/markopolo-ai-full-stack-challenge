@@ -13,6 +13,9 @@ export const envSchema = z.object({
   DB_USERNAME: z.string().default('pguser'),
   DB_PASSWORD: z.string().default('pgpassword'),
   DB_NAME: z.string().default('markopolo'),
+  // JWT Authentication
+  JWT_SECRET: z.string().nonempty(),
+  JWT_EXPIRATION_TIME: z.string().default('7d'),
 });
 
 export type Env = z.infer<typeof envSchema>;
