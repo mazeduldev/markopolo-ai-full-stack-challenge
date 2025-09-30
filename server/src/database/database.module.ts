@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSourceConnection } from './entities/data-source-connection.entity';
 import type { Env } from 'src/config/env.zod';
 
 @Module({
@@ -21,7 +20,6 @@ import type { Env } from 'src/config/env.zod';
       imports: [ConfigModule],
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([DataSourceConnection]),
   ],
   exports: [TypeOrmModule],
 })
