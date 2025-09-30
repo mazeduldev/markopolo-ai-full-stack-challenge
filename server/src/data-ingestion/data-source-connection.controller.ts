@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Patch,
   Post,
@@ -11,6 +12,7 @@ import {
 import { DataSourceConnectionService } from './data-source-connection.service';
 import type { AuthenticatedRequest } from 'src/auth/auth.types';
 import {
+  DataSourceConnectionViewType,
   dataSourceConnectionZodSchema,
   type CreateDataSourceConnectionDto,
 } from './data-source-connection.type';
@@ -45,5 +47,12 @@ export class DataSourceConnectionController {
       connectionId,
       request.user.id,
     );
+  }
+
+  @Get()
+  getConnections(
+    @Req() request: AuthenticatedRequest,
+  ): Promise<DataSourceConnectionViewType[]> {
+    return this.dataSourceService.getConnections(request.user.id);
   }
 }

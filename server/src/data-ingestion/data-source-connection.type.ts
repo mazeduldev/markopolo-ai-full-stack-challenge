@@ -38,6 +38,15 @@ export const dataSourceConnectionZodSchema = z.object({
     .optional(),
 });
 
+export const dataSourceConnectionViewZodSchema = z.object({
+  id: z.string().uuid(),
+  type: dataSourceTypeZodSchema,
+  status: connectionStatusZodSchema,
+});
+export type DataSourceConnectionViewType = z.infer<
+  typeof dataSourceConnectionViewZodSchema
+>;
+
 export type DataSourceConnectionType = z.infer<
   typeof dataSourceConnectionZodSchema
 >;

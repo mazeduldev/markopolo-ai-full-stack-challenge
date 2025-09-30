@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import {
   ConnectionStatus,
   CreateDataSourceConnectionDto,
+  DataSourceConnectionViewType,
+  dataSourceConnectionViewZodSchema,
   dataSourceConnectionZodSchema,
 } from './data-source-connection.type';
 
@@ -56,5 +58,17 @@ export class DataSourceConnectionService {
         : ConnectionStatus.CONNECTED;
 
     return this.dataSourceConnectionRepository.save(connection);
+  }
+
+  async getConnections(
+    userId: string,
+  ): Promise<DataSourceConnectionViewType[]> {
+    const connections = await this.dataSourceConnectionRepository.find({
+      where: { user_id: userId },
+    });
+
+    return connections.map((connection) =>
+      dataSourceConnectionViewZodSchema.parse(connection),
+    );
   }
 }
