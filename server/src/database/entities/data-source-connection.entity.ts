@@ -1,4 +1,3 @@
-// apps/campaign-backend/src/entities/data-source-connection.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,7 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from 'src/user/user.entity';
 
 export enum DataSourceType {
   SHOPIFY = 'shopify',

@@ -1,3 +1,7 @@
+import { Campaign } from 'src/database/entities/campaign.entity';
+import { ChatThread } from 'src/database/entities/chat-thread.entity';
+import { DataSourceConnection } from 'src/database/entities/data-source-connection.entity';
+import { UserSecret } from 'src/database/entities/user-secret.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,10 +12,6 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { Campaign } from './campaign.entity';
-import { ChatThread } from './chat-thread.entity';
-import { DataSourceConnection } from './data-source-connection.entity';
-import { UserSecret } from './user-secret.entity';
 
 @Entity('users')
 export class User {

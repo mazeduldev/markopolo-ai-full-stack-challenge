@@ -9,7 +9,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from 'src/user/user.entity';
 import { ChatMessage } from './chat-message.entity';
 
 @Entity('chat_threads')

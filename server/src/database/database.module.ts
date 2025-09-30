@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
 import { CampaignChannel } from './entities/campaign-channel.entity';
 import { Campaign } from './entities/campaign.entity';
 import { ChatMessage } from './entities/chat-message.entity';
@@ -28,7 +27,6 @@ import type { Env } from 'src/config/env.zod';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([
-      User,
       UserSecret,
       Campaign,
       CampaignChannel,
