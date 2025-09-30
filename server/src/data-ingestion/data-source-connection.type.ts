@@ -16,7 +16,7 @@ export enum ConnectionStatus {
 export const dataSourceTypeZodSchema = z.nativeEnum(DataSourceType);
 export const connectionStatusZodSchema = z.nativeEnum(ConnectionStatus);
 
-export const dataSourceConnectionSchema = z.object({
+export const dataSourceConnectionZodSchema = z.object({
   status: connectionStatusZodSchema.default(ConnectionStatus.CONNECTED),
   type: dataSourceTypeZodSchema,
 
@@ -39,11 +39,11 @@ export const dataSourceConnectionSchema = z.object({
 });
 
 export type DataSourceConnectionType = z.infer<
-  typeof dataSourceConnectionSchema
+  typeof dataSourceConnectionZodSchema
 >;
 
 export type CreateDataSourceConnectionDto = z.infer<
-  typeof dataSourceConnectionSchema
+  typeof dataSourceConnectionZodSchema
 >;
 export type UpdateDataSourceConnectionDto =
   Partial<CreateDataSourceConnectionDto>;
