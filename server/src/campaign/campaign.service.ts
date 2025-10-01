@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Campaign } from './campaign.entity';
+import { Campaign } from './entities/campaign.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CampaignChannel } from './campaign-channel.entity';
+import { CampaignChannel } from './entities/campaign-channel.entity';
 
 @Injectable()
 export class CampaignService {

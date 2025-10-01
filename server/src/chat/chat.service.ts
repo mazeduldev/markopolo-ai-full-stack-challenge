@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CampaignGeneratorAgentService } from 'src/agent/campaign-generator-agent.service';
-import { ChatThread } from './chat-thread.entity';
-import { ChatMessage } from './chat-message.entity';
+import { ChatThread } from './entities/chat-thread.entity';
+import { ChatMessage } from './entities/chat-message.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()

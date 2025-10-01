@@ -10,12 +10,12 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { DataSourceConnectionService } from './data-source-connection.service';
-import type { AuthenticatedRequest } from 'src/auth/auth.types';
+import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import {
   DataSourceConnectionViewType,
   dataSourceConnectionZodSchema,
   type CreateDataSourceConnectionDto,
-} from './data-source-connection.type';
+} from './dto/data-source-connection.dto';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import { ZodPipe } from 'src/pipes/zod.pipe';
 

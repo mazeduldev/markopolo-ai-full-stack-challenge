@@ -1,3 +1,4 @@
+// apps/campaign-backend/src/entities/chat-thread.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,8 +9,8 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { User } from 'src/user/user.entity';
-import { ChatMessage } from './chat-message.entity';
+import { User } from 'src/user/entities/user.entity';
+import { ChatMessage } from '../../chat/entities/chat-message.entity';
 
 @Entity('chat_threads')
 export class ChatThread {

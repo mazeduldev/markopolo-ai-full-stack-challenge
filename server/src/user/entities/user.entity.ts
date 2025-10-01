@@ -1,7 +1,7 @@
-import { Campaign } from 'src/campaign/campaign.entity';
-import { ChatThread } from 'src/chat/chat-thread.entity';
+import { Campaign } from 'src/campaign/entities/campaign.entity';
+import { ChatThread } from 'src/chat/entities/chat-thread.entity';
 import { DataSourceConnection } from 'src/data-ingestion/entities/data-source-connection.entity';
-import { Secret } from 'src/auth/secret.entity';
+import { Secret } from 'src/auth/entities/secret.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

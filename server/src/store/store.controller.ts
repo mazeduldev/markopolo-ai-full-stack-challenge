@@ -21,7 +21,7 @@ import {
 } from './dto/create-store.dto';
 import { ZodPipe } from 'src/pipes/zod.pipe';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
-import type { AuthenticatedRequest } from 'src/auth/auth.types';
+import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
 
 @Controller('store')
 @UseGuards(AccessTokenGuard)

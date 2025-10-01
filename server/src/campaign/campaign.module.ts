@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Campaign } from './campaign.entity';
-import { CampaignChannel } from './campaign-channel.entity';
+import { Campaign } from './entities/campaign.entity';
+import { CampaignChannel } from './entities/campaign-channel.entity';
 import { CampaignService } from './campaign.service';
 
 @Module({

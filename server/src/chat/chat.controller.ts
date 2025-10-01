@@ -9,13 +9,12 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import type { Observable } from 'rxjs';
-import type { CampaignGeneratorAgentService } from 'src/agent/campaign-generator-agent.service';
 import type { CampaignOutputType } from 'src/agent/campaign-generator.types';
 import { ZodPipe } from 'src/pipes/zod.pipe';
-import { type MessageDto, messageZodSchema } from './chat.types';
+import { type MessageDto, messageZodSchema } from './dto/chat.types';
 import { ChatService } from './chat.service';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
-import type { AuthenticatedRequest } from 'src/auth/auth.types';
+import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
 
 @Controller('chat')
 @UseGuards(AccessTokenGuard)

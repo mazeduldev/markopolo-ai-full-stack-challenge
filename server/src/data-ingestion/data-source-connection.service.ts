@@ -14,7 +14,7 @@ import {
   dataSourceConnectionViewZodSchema,
   dataSourceConnectionZodSchema,
   DataSourceType,
-} from './data-source-connection.type';
+} from './dto/data-source-connection.dto';
 import { StoreService } from 'src/store/store.service';
 import { ShopifySummary } from './entities/shopify-summary.entity';
 import { GoogleAdsSummary } from './entities/google-ads-summary.entity';

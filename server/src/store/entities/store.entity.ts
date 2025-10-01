@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
   OneToOne,
 } from 'typeorm';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import { GoogleAdsSummary } from 'src/data-ingestion/entities/google-ads-summary.entity';
 import { ShopifySummary } from 'src/data-ingestion/entities/shopify-summary.entity';
 import { WebsiteAnalyticsSummary } from 'src/data-ingestion/entities/website-analytics-summary.entity';

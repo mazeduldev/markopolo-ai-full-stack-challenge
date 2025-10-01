@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from 'src/user/user.service';
-import { JwtPayload, userMinimalZodSchema } from '../auth.types';
+import { JwtPayload, userMinimalZodSchema } from '../dto/auth.dto';
 import { ConfigService } from '@nestjs/config';
 import type { Env } from 'src/config/env.zod';
 

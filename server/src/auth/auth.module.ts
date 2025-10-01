@@ -8,7 +8,7 @@ import { LocalAuthGuard } from './passport/local-auth.guard';
 import { AccessTokenStrategy } from './passport/access-token.strategy';
 import { AccessTokenGuard } from './passport/access-token.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Secret } from './secret.entity';
+import { Secret } from './entities/secret.entity';
 
 @Module({
   imports: [UserModule, JwtModule, TypeOrmModule.forFeature([Secret])],

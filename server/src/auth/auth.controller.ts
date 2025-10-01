@@ -12,7 +12,7 @@ import type {
   AuthenticatedRequest,
   AuthTokens,
   RegisterUserDto,
-} from './auth.types';
+} from './dto/auth.dto';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 
 @Controller('auth')

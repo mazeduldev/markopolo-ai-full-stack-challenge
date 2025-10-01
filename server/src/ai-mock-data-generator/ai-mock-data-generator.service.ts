@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
-import { DataSourceType } from 'src/data-ingestion/data-source-connection.type';
+import { DataSourceType } from 'src/data-ingestion/dto/data-source-connection.dto';
 import {
   CreateGoogleAdsSummaryDto,
   CreateGoogleAdsSummaryZodSchema,

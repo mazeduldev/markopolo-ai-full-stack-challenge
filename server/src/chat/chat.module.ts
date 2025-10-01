@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ChatController } from './chat.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ChatMessage } from './chat-message.entity';
-import { ChatThread } from './chat-thread.entity';
+import { ChatMessage } from './entities/chat-message.entity';
+import { ChatThread } from './entities/chat-thread.entity';
 import { AgentModule } from 'src/agent/agent.module';
 import { ChatService } from './chat.service';
 

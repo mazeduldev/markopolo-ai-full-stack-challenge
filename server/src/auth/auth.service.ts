@@ -8,10 +8,10 @@ import {
   RegisterUserDto,
   UserMinimal,
   userMinimalZodSchema,
-} from './auth.types';
+} from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
-import { Secret } from 'src/auth/secret.entity';
+import { Secret } from 'src/auth/entities/secret.entity';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Env } from 'src/config/env.zod';

@@ -7,11 +7,11 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   ConnectionStatus,
   DataSourceType,
-} from '../data-source-connection.type';
+} from '../dto/data-source-connection.dto';
 
 @Entity('data_source_connections')
 export class DataSourceConnection {
