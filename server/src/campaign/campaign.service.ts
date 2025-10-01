@@ -20,7 +20,7 @@ export class CampaignService {
   ): Promise<Campaign> {
     const campaign = this.campaignRepository.create({
       ...campaignDto,
-      ...(userId ? { userId } : {}),
+      ...(userId ? { user_id: userId } : {}),
     });
     return this.campaignRepository.save(campaign);
   }
