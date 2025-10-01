@@ -25,7 +25,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
   constructor(private readonly storeService: StoreService) {}
 
   onModuleInit() {
-    this.insufficientDataResponderAgent = new Agent({
+    this.insufficientDataResponderAgent = Agent.create({
       name: 'Insufficient Data Responder Agent',
       instructions: `You are an agent that responds to users when there is insufficient data to generate a marketing campaign.
       - Your task is to inform the user to check their store connection in plain text.
@@ -42,7 +42,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
       },
     });
 
-    this.campaignGeneratorAgent = new Agent({
+    this.campaignGeneratorAgent = Agent.create({
       name: 'Campaign Generator Agent',
       instructions: `You are a marketing campaign generator agent.
       - Your task is to generate comprehensive marketing campaigns based on user input.
