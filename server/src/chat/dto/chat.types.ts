@@ -1,8 +1,10 @@
 import { z } from 'zod';
+import { MessageRole } from '../entities/chat-message.entity';
 
 export const messageZodSchema = z.object({
-  role: z.enum(['system', 'user', 'assistant']).optional(),
   content: z.string(),
+  role: z.nativeEnum(MessageRole).optional(),
+  threadId: z.string().uuid().optional(),
 });
 
 export type MessageDto = z.infer<typeof messageZodSchema>;

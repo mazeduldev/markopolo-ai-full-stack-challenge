@@ -9,7 +9,7 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
-import type { Observable } from 'rxjs';
+import { map, type Observable } from 'rxjs';
 import type { CreateCampaignDto } from 'src/campaign/dto/campaign.dto';
 import { ZodPipe } from 'src/pipes/zod.pipe';
 import { type MessageDto, messageZodSchema } from './dto/chat.types';
@@ -29,9 +29,10 @@ export class ChatController {
   async generateCampaign(
     @Body() body: MessageDto,
     @Req() req: AuthenticatedRequest,
-  ): Promise<CreateCampaignDto | string> {
+  ): Promise<{ threadId: string; content: CreateCampaignDto | string }> {
     const campaign = await this.chatService.generateCampaign(
       body.content,
+      body.threadId,
       req.user.id,
     );
     return campaign;
@@ -43,8 +44,21 @@ export class ChatController {
   generateCampaignStream(
     @Body() body: MessageDto,
     @Req() req: AuthenticatedRequest,
-  ): Observable<any> {
-    return this.chatService.generateCampaignStream(body.content, req.user.id);
+  ): Observable<MessageEvent> {
+    return this.chatService
+      .generateCampaignStream(body.content, body.threadId, req.user.id)
+      .pipe(
+        map(
+          (data) =>
+            ({
+              type: 'message',
+              data: JSON.stringify({
+                threadId: data.threadId,
+                chunk: data.data,
+              }),
+            }) as MessageEvent,
+        ),
+      );
   }
 
   // todo: add pagination in real world implementation

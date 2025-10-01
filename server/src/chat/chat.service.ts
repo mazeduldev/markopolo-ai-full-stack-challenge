@@ -1,12 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CampaignGeneratorAgentService } from 'src/agent/campaign-generator-agent.service';
 import { ChatThread } from './entities/chat-thread.entity';
 import { ChatMessage, MessageRole } from './entities/chat-message.entity';
 import { Repository } from 'typeorm';
 import { CampaignService } from 'src/campaign/campaign.service';
-import { Observable, tap } from 'rxjs';
-import { CreateCampaignZodSchema } from 'src/campaign/dto/campaign.dto';
+import { Observable, tap, map } from 'rxjs';
+import {
+  CreateCampaignDto,
+  CreateCampaignZodSchema,
+} from 'src/campaign/dto/campaign.dto';
 
 @Injectable()
 export class ChatService {
@@ -24,9 +27,13 @@ export class ChatService {
     private readonly chatMessageRepository: Repository<ChatMessage>,
   ) {}
 
-  async generateCampaign(prompt: string, userId: string) {
+  async generateCampaign(
+    prompt: string,
+    threadId: string | undefined,
+    userId: string,
+  ): Promise<{ threadId: string; content: string | CreateCampaignDto }> {
     // Create or get existing thread
-    const thread = await this.getOrCreateThread(userId);
+    const thread = await this.getOrCreateThread(userId, threadId, prompt);
 
     // Save user message
     await this.saveMessage(thread.id, MessageRole.USER, prompt);
@@ -45,7 +52,7 @@ export class ChatService {
       this.logger.log(
         `Handoff agent message saved with ID: ${assistantMessage.id}, thread ID: ${thread.id}, for user: ${userId}`,
       );
-      return agentResponse;
+      return { threadId: thread.id, content: agentResponse };
     }
 
     // Save the campaign to the database
@@ -68,21 +75,25 @@ export class ChatService {
       `Assistant message saved with ID: ${assistantMessage.id}, thread ID: ${thread.id}, for user: ${userId}`,
     );
 
-    return agentResponse;
+    return { threadId: thread.id, content: agentResponse };
   }
 
-  generateCampaignStream(prompt: string, userId: string) {
-    let thread: ChatThread;
+  generateCampaignStream(
+    prompt: string,
+    threadId: string | undefined,
+    userId: string,
+  ): Observable<{ data: string; threadId: string }> {
     let assistantMessage: ChatMessage;
     let fullResponse = '';
 
-    return new Observable((observer) => {
+    return new Observable<{ data: string; threadId: string }>((observer) => {
       const initializeChat = async () => {
         // Create or get existing thread
-        thread = await this.getOrCreateThread(userId);
+        const thread = await this.getOrCreateThread(userId, threadId, prompt);
 
         // Save user message
         await this.saveMessage(thread.id, MessageRole.USER, prompt);
+        return thread;
       };
 
       const stream = this.campaignGeneratorAgentService.generateCampaignStream(
@@ -91,12 +102,16 @@ export class ChatService {
       );
 
       initializeChat()
-        .then(() => {
+        .then((thread) => {
           stream
             .pipe(
               tap((chunk) => {
                 fullResponse += chunk.data;
               }),
+              map((chunk: { data: string }) => ({
+                data: chunk.data,
+                threadId: thread.id,
+              })),
             )
             .subscribe({
               next: (chunk) => observer.next(chunk),
@@ -144,25 +159,36 @@ export class ChatService {
     });
   }
 
-  private async getOrCreateThread(userId: string): Promise<ChatThread> {
-    // Find the most recent active thread for the user
-    let thread = await this.chatThreadRepository.findOne({
-      where: { user_id: userId, is_active: true },
-      order: { created_at: 'DESC' },
-    });
-
-    if (!thread) {
-      // Create new thread
-      thread = this.chatThreadRepository.create({
-        thread_id: `thread_${Date.now()}_${userId}`, // Generate unique thread ID
-        user_id: userId,
-        is_active: true,
-        title: 'Campaign Generation Chat',
+  private async getOrCreateThread(
+    userId: string,
+    threadId: string | undefined,
+    prompt: string,
+  ): Promise<ChatThread> {
+    if (threadId) {
+      const existingThread = await this.chatThreadRepository.findOne({
+        where: { id: threadId, user_id: userId },
+        relations: ['messages'],
       });
-      thread = await this.chatThreadRepository.save(thread);
+      if (existingThread) {
+        // Load only the last 10 messages in descending order
+        existingThread.messages = await this.chatMessageRepository.find({
+          where: { thread_id: existingThread.id },
+          order: { created_at: 'DESC' },
+          take: 10,
+        });
+        return existingThread;
+      }
+      throw new NotFoundException('Chat thread not found');
     }
 
-    return thread;
+    // Create new thread
+    let newThread = this.chatThreadRepository.create({
+      user_id: userId,
+      title: prompt.substring(0, 50), // First 50 chars of the prompt as title
+    });
+    newThread = await this.chatThreadRepository.save(newThread);
+
+    return newThread;
   }
 
   private async saveMessage(

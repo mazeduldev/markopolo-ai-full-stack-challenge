@@ -113,10 +113,13 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
     return result.finalOutput as CreateCampaignDto;
   }
 
-  generateCampaignStream(prompt: string, userId: string): Observable<any> {
+  generateCampaignStream(
+    prompt: string,
+    userId: string,
+  ): Observable<{ data: string }> {
     this.logger.log(`Generating streaming campaign for prompt: ${prompt}`);
 
-    return new Observable((observer) => {
+    return new Observable<{ data: string }>((observer) => {
       const runStream = async () => {
         try {
           const stream = await run(

@@ -7,23 +7,19 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ChatMessage } from './chat-message.entity';
 
 @Entity('chat_threads')
+@Index(['user_id', 'created_at'])
 export class ChatThread {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
-  thread_id: string; // OpenAI thread ID
-
   @Column({ nullable: true })
   title: string;
-
-  @Column({ type: 'boolean', default: true })
-  is_active: boolean;
 
   @CreateDateColumn()
   created_at: Date;
