@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Logger,
   Post,
   Req,
@@ -44,5 +45,11 @@ export class ChatController {
     @Req() req: AuthenticatedRequest,
   ): Observable<any> {
     return this.chatService.generateCampaignStream(body.content, req.user.id);
+  }
+
+  // todo: add pagination in real world implementation
+  @Get('history')
+  getChatHistoryByUser(@Req() req: AuthenticatedRequest) {
+    return this.chatService.getChatHistory(req.user.id);
   }
 }
