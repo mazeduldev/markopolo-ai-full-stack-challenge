@@ -45,11 +45,7 @@ export class StoreService {
     });
   }
 
-  update(id: number, updateStoreDto: UpdateStoreDto) {
-    return `This action updates a #${id} store`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} store`;
+  removeByUserId(userId: string) {
+    return this.storeRepository.delete({ user_id: userId });
   }
 }

@@ -51,6 +51,7 @@ export class User {
 
   @OneToOne(() => Store, (store) => store.user, {
     cascade: true,
+    onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'store_id' })
   store: Store;

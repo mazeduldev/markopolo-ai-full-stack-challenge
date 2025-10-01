@@ -11,6 +11,8 @@ import {
   Req,
   NotFoundException,
   BadRequestException,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
 import {
@@ -52,5 +54,11 @@ export class StoreController {
       throw new NotFoundException('Store not found for this user');
     }
     return store;
+  }
+
+  @Delete()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeStoreByUser(@Req() req: AuthenticatedRequest) {
+    await this.storeService.removeByUserId(req.user.id);
   }
 }
