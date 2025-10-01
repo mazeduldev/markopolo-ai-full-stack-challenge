@@ -1,10 +1,12 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Agent, AgentOutputType, run } from '@openai/agents';
+import { Agent, AgentOutputType, run, tool } from '@openai/agents';
 import {
   CampaignOutputType,
   campaignOutputZodSchema,
 } from './campaign-generator.types';
 import { Observable } from 'rxjs';
+import { StoreService } from 'src/store/store.service';
+import z from 'zod';
 
 @Injectable()
 export class CampaignGeneratorAgentService implements OnModuleInit {
@@ -15,15 +17,20 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
     AgentOutputType<CampaignOutputType>
   >;
 
+  private insufficientDataResponderAgent: Agent<
+    unknown,
+    AgentOutputType<string>
+  >;
+
+  constructor(private readonly storeService: StoreService) {}
+
   onModuleInit() {
-    this.campaignGeneratorAgent = new Agent({
-      name: 'Campaign Generator Agent',
-      instructions: `You are a helpful agent specialized in creating marketing campaigns.
-      Your task is to generate comprehensive marketing campaigns based on user input.
-      You should fetch relevant data using your available tools and compile it into a structured campaign format.
-      Always ensure that the campaigns you create are tailored to the user's needs and objectives.`,
-      tools: [],
-      outputType: campaignOutputZodSchema,
+    this.insufficientDataResponderAgent = new Agent({
+      name: 'Insufficient Data Responder Agent',
+      instructions: `You are an agent that responds to users when there is insufficient data to generate a marketing campaign.
+      - Your task is to inform the user to check their store connection in plain text.
+      `,
+      outputType: 'text',
       model: 'gpt-5-nano',
       modelSettings: {
         reasoning: {
@@ -34,23 +41,77 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
         },
       },
     });
+
+    this.campaignGeneratorAgent = new Agent({
+      name: 'Campaign Generator Agent',
+      instructions: `You are a marketing campaign generator agent.
+      - Your task is to generate comprehensive marketing campaigns based on user input.
+      - Fetch relevant data of the store using "fetch_store_data" tool and based on that data generate marketing campaign.
+      - If the tool returns null, then handoff to "Insufficient Data Responder Agent".
+      - If you get sufficient data for generating campaign, then provide the output in the specified JSON format.
+      `,
+      tools: [
+        tool({
+          name: 'fetch_store_data',
+          description:
+            'Fetches store data including products, customer demographics, and past marketing performance. Input is just the User ID.',
+          parameters: z.object({
+            userId: z.string().describe('The ID of the user'),
+          }),
+          execute: async ({ userId }) => {
+            this.logger.log(`Fetching store data for input: ${userId}`);
+            try {
+              const storeData =
+                await this.storeService.getStoreDataForCampaignCreation(userId);
+              return storeData;
+            } catch (error) {
+              this.logger.error(
+                `Error fetching store data for userId ${userId}: ${error.message}`,
+              );
+              return null;
+            }
+          },
+        }),
+      ],
+      outputType: campaignOutputZodSchema,
+      model: 'gpt-5-nano',
+      modelSettings: {
+        reasoning: {
+          effort: 'minimal',
+        },
+        text: {
+          verbosity: 'low',
+        },
+      },
+      handoffs: [this.insufficientDataResponderAgent],
+    });
   }
 
-  async generateCampaign(prompt: string): Promise<CampaignOutputType> {
+  async generateCampaign(
+    prompt: string,
+    userId: string,
+  ): Promise<CampaignOutputType> {
     this.logger.log(`Generating campaign for prompt: ${prompt}`);
-    const result = await run(this.campaignGeneratorAgent, prompt);
+    const result = await run(
+      this.campaignGeneratorAgent,
+      `${prompt}\nUser ID: ${userId}`,
+    );
     return result.finalOutput as CampaignOutputType;
   }
 
-  generateCampaignStream(prompt: string): Observable<any> {
+  generateCampaignStream(prompt: string, userId: string): Observable<any> {
     this.logger.log(`Generating streaming campaign for prompt: ${prompt}`);
 
     return new Observable((observer) => {
       const runStream = async () => {
         try {
-          const stream = await run(this.campaignGeneratorAgent, prompt, {
-            stream: true,
-          });
+          const stream = await run(
+            this.campaignGeneratorAgent,
+            `${prompt}\nUser ID: ${userId}`,
+            {
+              stream: true,
+            },
+          );
 
           const textStream = stream.toTextStream();
 

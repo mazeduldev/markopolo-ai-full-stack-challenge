@@ -10,6 +10,7 @@ import { ChatModule } from './chat/chat.module';
 import { CampaignModule } from './campaign/campaign.module';
 import { DataIngestionModule } from './data-ingestion/data-ingestion.module';
 import { StoreModule } from './store/store.module';
+import { AiMockDataGeneratorModule } from './ai-mock-data-generator/ai-mock-data-generator.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { StoreModule } from './store/store.module';
     CampaignModule,
     DataIngestionModule,
     StoreModule,
+    AiMockDataGeneratorModule,
   ],
   controllers: [AppController],
 })

@@ -13,14 +13,14 @@ import {
 import {
   CreateWebsiteAnalyticsSummaryDto,
   CreateWebsiteAnalyticsSummaryZodSchema,
-} from 'src/data-ingestion/dto/website-analitycis-summary.dto';
+} from 'src/data-ingestion/dto/website-analytics-summary.dto';
 
 /**
  * This service would contain methods to generate mock data to make this demo app work.
  */
 @Injectable()
-export class MockDataGeneratorService implements OnModuleInit {
-  private readonly logger = new Logger(MockDataGeneratorService.name);
+export class AiMockDataGeneratorService implements OnModuleInit {
+  private readonly logger = new Logger(AiMockDataGeneratorService.name);
   private openai: OpenAI;
   private readonly defaultModel = 'gpt-5-nano';
 

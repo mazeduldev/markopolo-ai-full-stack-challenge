@@ -15,7 +15,6 @@ import {
   dataSourceConnectionZodSchema,
   DataSourceType,
 } from './data-source-connection.type';
-import { MockDataGeneratorService } from 'src/agent/mock-data-generator.service';
 import { StoreService } from 'src/store/store.service';
 import { ShopifySummary } from './entities/shopify-summary.entity';
 import { GoogleAdsSummary } from './entities/google-ads-summary.entity';
@@ -31,7 +30,8 @@ import {
 import {
   CreateWebsiteAnalyticsSummaryDto,
   CreateWebsiteAnalyticsSummaryZodSchema,
-} from './dto/website-analitycis-summary.dto';
+} from './dto/website-analytics-summary.dto';
+import { AiMockDataGeneratorService } from 'src/ai-mock-data-generator/ai-mock-data-generator.service';
 
 @Injectable()
 export class DataSourceConnectionService {
@@ -51,7 +51,7 @@ export class DataSourceConnectionService {
     private readonly websiteAnalyticsSummaryRepository: Repository<WebsiteAnalyticsSummary>,
 
     private readonly storeService: StoreService,
-    private readonly mockDataGeneratorService: MockDataGeneratorService,
+    private readonly mockDataGeneratorService: AiMockDataGeneratorService,
   ) {}
 
   async createConnection(

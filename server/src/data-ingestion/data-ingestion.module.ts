@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { DataSourceConnection } from './entities/data-source-connection.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSourceConnectionController } from './data-source-connection.controller';
@@ -8,6 +8,8 @@ import { ShopifySummary } from './entities/shopify-summary.entity';
 import { WebsiteAnalyticsSummary } from './entities/website-analytics-summary.entity';
 import { AgentModule } from 'src/agent/agent.module';
 import { StoreModule } from 'src/store/store.module';
+import { DataSummaryService } from './data-summary.service';
+import { AiMockDataGeneratorModule } from 'src/ai-mock-data-generator/ai-mock-data-generator.module';
 
 @Module({
   imports: [
@@ -17,10 +19,11 @@ import { StoreModule } from 'src/store/store.module';
       ShopifySummary,
       WebsiteAnalyticsSummary,
     ]),
-    AgentModule,
-    StoreModule,
+    AiMockDataGeneratorModule,
+    forwardRef(() => StoreModule),
   ],
   controllers: [DataSourceConnectionController],
-  providers: [DataSourceConnectionService],
+  providers: [DataSourceConnectionService, DataSummaryService],
+  exports: [DataSummaryService],
 })
 export class DataIngestionModule {}

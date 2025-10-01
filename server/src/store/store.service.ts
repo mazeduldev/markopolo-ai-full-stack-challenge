@@ -1,10 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStoreDto } from './dto/create-store.dto';
-import { UpdateStoreDto } from './dto/update-store.dto';
 import { Repository } from 'typeorm';
 import { Store } from './entities/store.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from 'src/user/user.service';
+import { DataSummaryService } from 'src/data-ingestion/data-summary.service';
+import { CreateGoogleAdsSummaryZodSchema } from 'src/data-ingestion/dto/google-ads-summary.dto';
+import { CreateShopifySummaryZodSchema } from 'src/data-ingestion/dto/shopify-summary.dto';
+import { CreateWebsiteAnalyticsSummaryZodSchema } from 'src/data-ingestion/dto/website-analytics-summary.dto';
 
 @Injectable()
 export class StoreService {
@@ -12,6 +15,7 @@ export class StoreService {
     @InjectRepository(Store)
     private readonly storeRepository: Repository<Store>,
     private readonly userService: UserService,
+    private readonly dataSummaryService: DataSummaryService,
   ) {}
 
   async create(createStoreDto: CreateStoreDto, userId: string) {
@@ -47,5 +51,34 @@ export class StoreService {
 
   removeByUserId(userId: string) {
     return this.storeRepository.delete({ user_id: userId });
+  }
+
+  async getStoreDataForCampaignCreation(userId: string) {
+    const store = await this.storeRepository.findOne({
+      where: { user_id: userId },
+    });
+
+    if (!store) {
+      throw new NotFoundException('Store not found');
+    }
+
+    const [google_ads, shopify, website_analytics] = await Promise.all([
+      this.dataSummaryService.getLatestGoogleAdsSummaryByStore(store.id),
+      this.dataSummaryService.getLatestShopifySummaryByStore(store.id),
+      this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByStore(store.id),
+    ]);
+
+    return {
+      store: {
+        name: store.name,
+        url: store.url,
+        currency: store.currency,
+        timezone: store.timezone,
+      },
+      google_ads: CreateGoogleAdsSummaryZodSchema.parse(google_ads),
+      shopify: CreateShopifySummaryZodSchema.parse(shopify),
+      website_analytics:
+        CreateWebsiteAnalyticsSummaryZodSchema.parse(website_analytics),
+    };
   }
 }

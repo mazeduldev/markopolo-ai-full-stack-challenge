@@ -1,12 +1,24 @@
-import { Body, Controller, Logger, Post, Sse, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Logger,
+  Post,
+  Req,
+  Sse,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 import type { Observable } from 'rxjs';
 import type { CampaignGeneratorAgentService } from 'src/agent/campaign-generator-agent.service';
 import type { CampaignOutputType } from 'src/agent/campaign-generator.types';
 import { ZodPipe } from 'src/pipes/zod.pipe';
 import { type MessageDto, messageZodSchema } from './chat.types';
 import { ChatService } from './chat.service';
+import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
+import type { AuthenticatedRequest } from 'src/auth/auth.types';
 
 @Controller('chat')
+@UseGuards(AccessTokenGuard)
 export class ChatController {
   private readonly logger = new Logger(ChatController.name);
 
@@ -16,8 +28,12 @@ export class ChatController {
   @UsePipes(new ZodPipe(messageZodSchema))
   async generateCampaign(
     @Body() body: MessageDto,
+    @Req() req: AuthenticatedRequest,
   ): Promise<CampaignOutputType> {
-    const campaign = await this.chatService.generateCampaign(body.content);
+    const campaign = await this.chatService.generateCampaign(
+      body.content,
+      req.user.id,
+    );
     return campaign;
   }
 
@@ -26,7 +42,8 @@ export class ChatController {
   @UsePipes(new ZodPipe(messageZodSchema))
   generateCampaignStream(
     @Body() body: MessageDto,
+    @Req() req: AuthenticatedRequest,
   ): Observable<CampaignOutputType> {
-    return this.chatService.generateCampaignStream(body.content);
+    return this.chatService.generateCampaignStream(body.content, req.user.id);
   }
 }

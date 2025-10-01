@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CampaignGeneratorAgentService } from './campaign-generator-agent.service';
-import { MockDataGeneratorService } from './mock-data-generator.service';
+import { StoreModule } from 'src/store/store.module';
 
 @Module({
-  imports: [ConfigModule],
-  providers: [CampaignGeneratorAgentService, MockDataGeneratorService],
-  exports: [CampaignGeneratorAgentService, MockDataGeneratorService],
+  imports: [ConfigModule, StoreModule],
+  providers: [CampaignGeneratorAgentService],
+  exports: [CampaignGeneratorAgentService],
 })
 export class AgentModule {}

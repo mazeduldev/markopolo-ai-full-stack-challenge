@@ -17,11 +17,14 @@ export class ChatService {
     private readonly chatMessageRepository: Repository<ChatMessage>,
   ) {}
 
-  generateCampaign(prompt: string) {
-    return this.campaignGeneratorAgentService.generateCampaign(prompt);
+  generateCampaign(prompt: string, userId: string) {
+    return this.campaignGeneratorAgentService.generateCampaign(prompt, userId);
   }
 
-  generateCampaignStream(prompt: string) {
-    return this.campaignGeneratorAgentService.generateCampaignStream(prompt);
+  generateCampaignStream(prompt: string, userId: string) {
+    return this.campaignGeneratorAgentService.generateCampaignStream(
+      prompt,
+      userId,
+    );
   }
 }
