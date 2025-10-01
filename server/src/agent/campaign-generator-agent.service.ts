@@ -1,9 +1,9 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Agent, AgentOutputType, run, tool } from '@openai/agents';
+import { Agent, AgentOutputType, handoff, run, tool } from '@openai/agents';
 import {
-  CampaignOutputType,
-  campaignOutputZodSchema,
-} from './campaign-generator.types';
+  CreateCampaignDto,
+  CreateCampaignZodSchema,
+} from '../campaign/dto/campaign.dto';
 import { Observable } from 'rxjs';
 import { StoreService } from 'src/store/store.service';
 import z from 'zod';
@@ -14,7 +14,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
 
   private campaignGeneratorAgent: Agent<
     unknown,
-    AgentOutputType<CampaignOutputType>
+    AgentOutputType<CreateCampaignDto>
   >;
 
   private insufficientDataResponderAgent: Agent<
@@ -73,7 +73,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
           },
         }),
       ],
-      outputType: campaignOutputZodSchema,
+      outputType: CreateCampaignZodSchema,
       model: 'gpt-5-nano',
       modelSettings: {
         reasoning: {
@@ -83,20 +83,34 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
           verbosity: 'low',
         },
       },
-      handoffs: [this.insufficientDataResponderAgent],
+      handoffs: [handoff(this.insufficientDataResponderAgent)],
     });
+  }
+
+  private isStringOutput(output: unknown): output is string {
+    return typeof output === 'string';
   }
 
   async generateCampaign(
     prompt: string,
     userId: string,
-  ): Promise<CampaignOutputType> {
+  ): Promise<CreateCampaignDto | string> {
     this.logger.log(`Generating campaign for prompt: ${prompt}`);
     const result = await run(
       this.campaignGeneratorAgent,
       `${prompt}\nUser ID: ${userId}`,
     );
-    return result.finalOutput as CampaignOutputType;
+
+    if (this.isStringOutput(result.finalOutput)) {
+      return result.finalOutput;
+    }
+
+    this.logger.log(
+      `Campaign generated successfully for user: ${userId}. Output: ${JSON.stringify(
+        result.finalOutput,
+      )}`,
+    );
+    return result.finalOutput as CreateCampaignDto;
   }
 
   generateCampaignStream(prompt: string, userId: string): Observable<any> {

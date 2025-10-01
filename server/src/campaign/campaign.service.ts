@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Campaign } from './entities/campaign.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import {
+  CreateCampaignDto,
+  CreateCampaignWithUserDto,
+} from './dto/campaign.dto';
 
 @Injectable()
 export class CampaignService {
@@ -9,4 +13,15 @@ export class CampaignService {
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
   ) {}
+
+  saveCampaign(
+    campaignDto: CreateCampaignDto | CreateCampaignWithUserDto,
+    userId?: string,
+  ): Promise<Campaign> {
+    const campaign = this.campaignRepository.create({
+      ...campaignDto,
+      ...(userId ? { userId } : {}),
+    });
+    return this.campaignRepository.save(campaign);
+  }
 }

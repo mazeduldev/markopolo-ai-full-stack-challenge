@@ -9,13 +9,7 @@ import {
   Index,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
-
-export enum ChannelType {
-  EMAIL = 'email',
-  SMS = 'sms',
-  PUSH = 'push',
-  WHATSAPP = 'whatsapp',
-}
+import { ChannelType } from '../dto/campaign.dto';
 
 @Entity('campaigns')
 @Index(['user_id', 'created_at'])
@@ -61,21 +55,6 @@ export class Campaign {
     click_rate: number;
     conversion_rate: number;
     roi: number;
-  };
-
-  @Column({ type: 'text', nullable: true })
-  user_query: string; // Original user request that generated this campaign
-
-  @Column({ type: 'simple-array', nullable: true })
-  data_sources_used: string[]; // ['shopify', 'google_ads', 'website_analytics']
-
-  @Column({ type: 'jsonb', nullable: true })
-  generation_metadata: {
-    model?: string;
-    thread_id?: string;
-    run_id?: string;
-    execution_time_ms?: number;
-    tokens_used?: number;
   };
 
   @CreateDateColumn()

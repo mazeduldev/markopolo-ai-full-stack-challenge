@@ -5,9 +5,14 @@ import { ChatMessage } from './entities/chat-message.entity';
 import { ChatThread } from './entities/chat-thread.entity';
 import { AgentModule } from 'src/agent/agent.module';
 import { ChatService } from './chat.service';
+import { CampaignModule } from 'src/campaign/campaign.module';
 
 @Module({
-  imports: [AgentModule, TypeOrmModule.forFeature([ChatThread, ChatMessage])],
+  imports: [
+    TypeOrmModule.forFeature([ChatThread, ChatMessage]),
+    AgentModule,
+    CampaignModule,
+  ],
   controllers: [ChatController],
   providers: [ChatService],
 })

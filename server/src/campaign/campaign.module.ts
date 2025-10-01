@@ -6,5 +6,6 @@ import { CampaignService } from './campaign.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Campaign])],
   providers: [CampaignService],
+  exports: [CampaignService],
 })
 export class CampaignModule {}

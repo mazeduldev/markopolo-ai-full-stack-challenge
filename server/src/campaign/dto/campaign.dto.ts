@@ -1,8 +1,15 @@
 import { z } from 'zod';
 
-export const campaignOutputZodSchema = z.object({
-  campaignTitle: z.string().describe('The title of the marketing campaign'),
-  targetAudience: z
+export enum ChannelType {
+  EMAIL = 'email',
+  SMS = 'sms',
+  PUSH = 'push',
+  WHATSAPP = 'whatsapp',
+}
+
+export const CreateCampaignZodSchema = z.object({
+  campaign_title: z.string().describe('The title of the marketing campaign'),
+  target_audience: z
     .string()
     .describe('A description of the target audience for the campaign'),
   message: z
@@ -22,7 +29,7 @@ export const campaignOutputZodSchema = z.object({
     })
     .describe('The main message of the campaign'),
   channels: z
-    .array(z.enum(['email', 'sms', 'push', 'whatsapp']))
+    .array(z.nativeEnum(ChannelType))
     .describe(
       'The marketing channels to be used for the campaign (e.g., email, sms, push, whatsapp, etc.)',
     ),
@@ -63,4 +70,14 @@ export const campaignOutputZodSchema = z.object({
     ),
 });
 
-export type CampaignOutputType = z.infer<typeof campaignOutputZodSchema>;
+export const CreateCampaignWithUserZodSchema = CreateCampaignZodSchema.extend({
+  user_id: z
+    .string()
+    .uuid()
+    .describe('The ID of the user creating the campaign'),
+});
+
+export type CreateCampaignDto = z.infer<typeof CreateCampaignZodSchema>;
+export type CreateCampaignWithUserDto = z.infer<
+  typeof CreateCampaignWithUserZodSchema
+>;

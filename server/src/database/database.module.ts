@@ -21,6 +21,5 @@ import type { Env } from 'src/config/env.zod';
       inject: [ConfigService],
     }),
   ],
-  exports: [TypeOrmModule],
 })
 export class DatabaseModule {}

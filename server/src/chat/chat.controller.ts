@@ -9,7 +9,7 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import type { Observable } from 'rxjs';
-import type { CampaignOutputType } from 'src/agent/campaign-generator.types';
+import type { CreateCampaignDto } from 'src/campaign/dto/campaign.dto';
 import { ZodPipe } from 'src/pipes/zod.pipe';
 import { type MessageDto, messageZodSchema } from './dto/chat.types';
 import { ChatService } from './chat.service';
@@ -28,7 +28,7 @@ export class ChatController {
   async generateCampaign(
     @Body() body: MessageDto,
     @Req() req: AuthenticatedRequest,
-  ): Promise<CampaignOutputType> {
+  ): Promise<CreateCampaignDto | string> {
     const campaign = await this.chatService.generateCampaign(
       body.content,
       req.user.id,
@@ -42,7 +42,7 @@ export class ChatController {
   generateCampaignStream(
     @Body() body: MessageDto,
     @Req() req: AuthenticatedRequest,
-  ): Observable<CampaignOutputType> {
+  ): Observable<any> {
     return this.chatService.generateCampaignStream(body.content, req.user.id);
   }
 }
