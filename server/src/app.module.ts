@@ -9,6 +9,7 @@ import { DatabaseModule } from './database/database.module';
 import { ChatModule } from './chat/chat.module';
 import { CampaignModule } from './campaign/campaign.module';
 import { DataIngestionModule } from './data-ingestion/data-ingestion.module';
+import { StoreModule } from './store/store.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { DataIngestionModule } from './data-ingestion/data-ingestion.module';
     ChatModule,
     CampaignModule,
     DataIngestionModule,
+    StoreModule,
   ],
   controllers: [AppController],
 })

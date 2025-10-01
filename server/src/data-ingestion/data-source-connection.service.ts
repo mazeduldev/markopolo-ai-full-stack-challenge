@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSourceConnection } from './data-source-connection.entity';
+import { DataSourceConnection } from './entities/data-source-connection.entity';
 import { Repository } from 'typeorm';
 import {
   ConnectionStatus,

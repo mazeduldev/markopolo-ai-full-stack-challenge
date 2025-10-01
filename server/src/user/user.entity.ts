@@ -1,6 +1,6 @@
 import { Campaign } from 'src/campaign/campaign.entity';
 import { ChatThread } from 'src/chat/chat-thread.entity';
-import { DataSourceConnection } from 'src/data-ingestion/data-source-connection.entity';
+import { DataSourceConnection } from 'src/data-ingestion/entities/data-source-connection.entity';
 import { Secret } from 'src/auth/secret.entity';
 import {
   Entity,
@@ -12,6 +12,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
+import { Store } from 'src/store/entities/store.entity';
 
 @Entity('users')
 export class User {
@@ -47,4 +48,13 @@ export class User {
 
   @OneToMany(() => DataSourceConnection, (connection) => connection.user)
   data_source_connections: DataSourceConnection[];
+
+  @OneToOne(() => Store, (store) => store.user, {
+    cascade: true,
+  })
+  @JoinColumn({ name: 'store_id' })
+  store: Store;
+
+  @Column({ nullable: true })
+  store_id: string;
 }

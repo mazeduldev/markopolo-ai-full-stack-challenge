@@ -11,7 +11,7 @@ import { User } from 'src/user/user.entity';
 import {
   ConnectionStatus,
   DataSourceType,
-} from './data-source-connection.type';
+} from '../data-source-connection.type';
 
 @Entity('data_source_connections')
 export class DataSourceConnection {
