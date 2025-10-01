@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,13 +13,45 @@ import {
   DataSourceConnectionViewType,
   dataSourceConnectionViewZodSchema,
   dataSourceConnectionZodSchema,
+  DataSourceType,
 } from './data-source-connection.type';
+import { MockDataGeneratorService } from 'src/agent/mock-data-generator.service';
+import { StoreService } from 'src/store/store.service';
+import { ShopifySummary } from './entities/shopify-summary.entity';
+import { GoogleAdsSummary } from './entities/google-ads-summary.entity';
+import { WebsiteAnalyticsSummary } from './entities/website-analytics-summary.entity';
+import {
+  CreateGoogleAdsSummaryDto,
+  CreateGoogleAdsSummaryZodSchema,
+} from './dto/google-ads-summary.dto';
+import {
+  CreateShopifySummaryDto,
+  CreateShopifySummaryZodSchema,
+} from './dto/shopify-summary.dto';
+import {
+  CreateWebsiteAnalyticsSummaryDto,
+  CreateWebsiteAnalyticsSummaryZodSchema,
+} from './dto/website-analitycis-summary.dto';
 
 @Injectable()
 export class DataSourceConnectionService {
+  private readonly logger = new Logger(DataSourceConnectionService.name);
+
   constructor(
     @InjectRepository(DataSourceConnection)
     private readonly dataSourceConnectionRepository: Repository<DataSourceConnection>,
+
+    @InjectRepository(ShopifySummary)
+    private readonly shopifySummaryRepository: Repository<ShopifySummary>,
+
+    @InjectRepository(GoogleAdsSummary)
+    private readonly googleAdsSummaryRepository: Repository<GoogleAdsSummary>,
+
+    @InjectRepository(WebsiteAnalyticsSummary)
+    private readonly websiteAnalyticsSummaryRepository: Repository<WebsiteAnalyticsSummary>,
+
+    private readonly storeService: StoreService,
+    private readonly mockDataGeneratorService: MockDataGeneratorService,
   ) {}
 
   async createConnection(
@@ -35,12 +68,94 @@ export class DataSourceConnectionService {
       throw new BadRequestException('Connection already exists');
     }
 
+    const store = await this.storeService.getStoreByUserId(userId);
+    if (!store) {
+      throw new NotFoundException('Please create a store first');
+    }
+
     const connection = this.dataSourceConnectionRepository.create({
       ...createConnectionDto,
       user_id: userId,
     });
 
-    return this.dataSourceConnectionRepository.save(connection);
+    const savedConnection =
+      await this.dataSourceConnectionRepository.save(connection);
+
+    // Once connection is created, data ingestion pipeline should start
+    // This can be implemented using event emitters or message queues in real world applications
+    try {
+      const dataSummary = await this.mockDataGeneratorService.generateMockData(
+        store,
+        connection.type,
+      );
+      this.logger.log(`Generated data summary: ${JSON.stringify(dataSummary)}`);
+      await this.saveDataSummary(connection.type, dataSummary, store.id);
+    } catch (error) {
+      this.logger.error(
+        `Failed to ingest data for connection ${savedConnection.id}: ${error.message}`,
+      );
+    }
+
+    return savedConnection;
+  }
+
+  private async saveDataSummary(
+    type: DataSourceType,
+    dataSummary:
+      | CreateGoogleAdsSummaryDto
+      | CreateShopifySummaryDto
+      | CreateWebsiteAnalyticsSummaryDto,
+    storeId: string,
+  ) {
+    this.logger.log(
+      `Saving data summary for store ${storeId} and data source type ${type}`,
+    );
+
+    switch (type) {
+      case DataSourceType.SHOPIFY: {
+        const shopifyData = CreateShopifySummaryZodSchema.parse(dataSummary);
+        const shopifySummary = this.shopifySummaryRepository.create({
+          ...shopifyData,
+          store_id: storeId,
+        });
+        this.logger.log(
+          `Shopify Summary to be saved: ${JSON.stringify(shopifySummary)}`,
+        );
+        await this.shopifySummaryRepository.save(shopifySummary);
+        break;
+      }
+      case DataSourceType.GOOGLE_ADS: {
+        const googleAdsData =
+          CreateGoogleAdsSummaryZodSchema.parse(dataSummary);
+        const googleAdsSummary = this.googleAdsSummaryRepository.create({
+          ...googleAdsData,
+          store_id: storeId,
+        });
+        this.logger.log(
+          `Google Ads Summary to be saved: ${JSON.stringify(googleAdsSummary)}`,
+        );
+        await this.googleAdsSummaryRepository.save(googleAdsSummary);
+        break;
+      }
+      case DataSourceType.WEBSITE_ANALYTICS: {
+        const websiteAnalyticsData =
+          CreateWebsiteAnalyticsSummaryZodSchema.parse(dataSummary);
+        const websiteAnalyticsSummary =
+          this.websiteAnalyticsSummaryRepository.create({
+            ...websiteAnalyticsData,
+            store_id: storeId,
+          });
+        this.logger.log(
+          `Website Analytics Summary to be saved: ${JSON.stringify(websiteAnalyticsSummary)}`,
+        );
+        await this.websiteAnalyticsSummaryRepository.save(
+          websiteAnalyticsSummary,
+        );
+        break;
+      }
+      default:
+        throw new Error('Unsupported data source type');
+    }
   }
 
   async toggleConnection(connectionId: string, userId: string) {

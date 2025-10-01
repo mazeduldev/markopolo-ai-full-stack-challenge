@@ -1,19 +1,26 @@
+import { Store } from 'src/store/entities/store.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
   Column,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
-import { DataSourceSummary } from './data-source-summary.entity';
 
 @Entity('website_analytics_summaries')
 export class WebsiteAnalyticsSummary {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => DataSourceSummary, (ds) => ds.website_analytics_summaries)
-  data_source: DataSourceSummary;
+  @ManyToOne(() => Store, (store) => store.website_analytics_summaries, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'store_id' })
+  store: Store;
+
+  @Column()
+  store_id: string;
 
   @Column('jsonb')
   traffic_summary: {
@@ -33,9 +40,9 @@ export class WebsiteAnalyticsSummary {
 
   @Column('jsonb')
   user_demographics: {
-    age_groups: Record<string, number>;
-    locations: Record<string, number>;
-    devices: Record<string, number>;
+    age_groups: Record<string, number> | null;
+    locations: Record<string, number> | null;
+    devices: Record<string, number> | null;
   };
 
   @CreateDateColumn()

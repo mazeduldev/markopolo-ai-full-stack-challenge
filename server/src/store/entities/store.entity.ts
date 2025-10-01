@@ -8,7 +8,9 @@ import {
   OneToOne,
 } from 'typeorm';
 import { User } from 'src/user/user.entity';
-import { DataSourceSummary } from 'src/data-ingestion/entities/data-source-summary.entity';
+import { GoogleAdsSummary } from 'src/data-ingestion/entities/google-ads-summary.entity';
+import { ShopifySummary } from 'src/data-ingestion/entities/shopify-summary.entity';
+import { WebsiteAnalyticsSummary } from 'src/data-ingestion/entities/website-analytics-summary.entity';
 
 @Entity('stores')
 export class Store {
@@ -17,6 +19,15 @@ export class Store {
 
   @OneToOne(() => User, (user) => user.store)
   user: User;
+
+  @OneToMany(() => GoogleAdsSummary, (summary) => summary.store)
+  google_ads_summaries: GoogleAdsSummary[];
+
+  @OneToMany(() => ShopifySummary, (summary) => summary.store)
+  shopify_summaries: ShopifySummary[];
+
+  @OneToMany(() => WebsiteAnalyticsSummary, (summary) => summary.store)
+  website_analytics_summaries: WebsiteAnalyticsSummary[];
 
   @Column()
   user_id: string;
@@ -32,9 +43,6 @@ export class Store {
 
   @Column({ type: 'varchar', length: 50, default: 'UTC' })
   timezone: string;
-
-  @OneToMany(() => DataSourceSummary, (ds) => ds.store)
-  data_sources: DataSourceSummary[];
 
   @CreateDateColumn()
   created_at: Date;

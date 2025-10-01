@@ -1,19 +1,26 @@
+import { Store } from 'src/store/entities/store.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
   Column,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
-import { DataSourceSummary } from './data-source-summary.entity';
 
 @Entity('shopify_summaries')
 export class ShopifySummary {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => DataSourceSummary, (ds) => ds.shopify_summaries)
-  data_source: DataSourceSummary;
+  @ManyToOne(() => Store, (store) => store.shopify_summaries, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'store_id' })
+  store: Store;
+
+  @Column()
+  store_id: string;
 
   @Column('jsonb')
   products: Array<{
