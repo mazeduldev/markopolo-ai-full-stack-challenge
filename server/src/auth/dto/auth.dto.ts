@@ -1,24 +1,32 @@
 import { Request } from 'express';
+import { createStoreDtoZodSchema } from 'src/store/dto/create-store.dto';
 import { z } from 'zod';
 
+// register user request should use this schema
 export const registerUserZodSchema = z.object({
   email: z.string().email('Invalid email format'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  full_name: z.string().min(1, 'Full name is required'),
-  company_name: z.string().optional(),
+  password: z.string().min(4, 'Password must be at least 4 characters'),
+  name: z.string().min(1, 'Name is required'),
+  store: createStoreDtoZodSchema,
 });
 export type RegisterUserDto = z.infer<typeof registerUserZodSchema>;
 
+// use this schema when creating a user through userService
+export const createUserZodSchema = registerUserZodSchema.omit({ store: true });
+export type CreateUserDto = z.infer<typeof createUserZodSchema>;
+
 export const loginUserZodSchema = z.object({
   email: z.string().email('Invalid email format'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string(),
 });
 export type LoginUserDto = z.infer<typeof loginUserZodSchema>;
 
 export const authTokensZodSchema = z.object({
   access_token: z.string().describe('JWT access token'),
   // refresh_token: z.string().describe('JWT refresh token'),
-  // expires_in: z.number().describe('Access token expiration time in seconds'),
+  access_token_expires_in: z
+    .number()
+    .describe('Access token expiration time in seconds'),
 });
 
 export type AuthTokens = z.infer<typeof authTokensZodSchema>;

@@ -18,7 +18,7 @@ export class StoreService {
     private readonly dataSummaryService: DataSummaryService,
   ) {}
 
-  async create(createStoreDto: CreateStoreDto, userId: string) {
+  async createAndSave(createStoreDto: CreateStoreDto, userId: string) {
     const isExists = await this.storeRepository.exists({
       where: { user_id: userId },
     });

@@ -35,7 +35,7 @@ export class StoreController {
     @Body() createStoreDto: CreateStoreDto,
   ) {
     try {
-      return await this.storeService.create(createStoreDto, req.user.id);
+      return await this.storeService.createAndSave(createStoreDto, req.user.id);
     } catch (error) {
       if (error instanceof Error && error.message === 'isExists') {
         throw new BadRequestException('Store already exists for this user');

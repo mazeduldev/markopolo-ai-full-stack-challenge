@@ -6,14 +6,17 @@ import {
   Post,
   Req,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import type {
-  AuthenticatedRequest,
-  AuthTokens,
-  RegisterUserDto,
+import {
+  registerUserZodSchema,
+  type AuthenticatedRequest,
+  type AuthTokens,
+  type RegisterUserDto,
 } from './dto/auth.dto';
 import { LocalAuthGuard } from './passport/local-auth.guard';
+import { ZodPipe } from 'src/pipes/zod.pipe';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +24,7 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ZodPipe(registerUserZodSchema))
   register(@Body() registerUserDto: RegisterUserDto): Promise<AuthTokens> {
     return this.authService.register(registerUserDto);
   }

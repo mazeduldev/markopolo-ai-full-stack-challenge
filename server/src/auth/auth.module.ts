@@ -9,9 +9,15 @@ import { AccessTokenStrategy } from './passport/access-token.strategy';
 import { AccessTokenGuard } from './passport/access-token.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Secret } from './entities/secret.entity';
+import { StoreModule } from 'src/store/store.module';
 
 @Module({
-  imports: [UserModule, JwtModule, TypeOrmModule.forFeature([Secret])],
+  imports: [
+    TypeOrmModule.forFeature([Secret]),
+    UserModule,
+    JwtModule,
+    StoreModule,
+  ],
   providers: [
     AuthService,
     LocalStrategy,
