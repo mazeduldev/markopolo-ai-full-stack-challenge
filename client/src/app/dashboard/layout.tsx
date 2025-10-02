@@ -2,7 +2,7 @@
 
 import { PropsWithChildren } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -27,7 +27,14 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { useUser } from "@/context/user-context";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navItems = [
   {
@@ -55,6 +62,7 @@ const navItems = [
 export default function DashboardLayout({ children }: PropsWithChildren) {
   const pathname = usePathname();
   const { user } = useUser();
+  const router = useRouter();
 
   return (
     <SidebarProvider>
@@ -105,24 +113,42 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild size={"lg"}>
-                <button
-                  onClick={() => {
-                    // Implement your logout logic here
-                    console.log("Logging out...");
-                  }}
-                >
-                  <Avatar className="w-10 h-10">
-                    <AvatarFallback className="bg-muted-foreground text-background">
-                      {user?.name?.charAt(0) || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col items-start">
-                    <span className="font-bold">{user?.name}</span>
-                    <span className="text-sm">{user?.email}</span>
-                  </div>
-                </button>
-              </SidebarMenuButton>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton asChild size={"lg"}>
+                    <button className="flex w-full items-center space-x-3">
+                      <Avatar className="w-10 h-10">
+                        <AvatarFallback className="bg-muted-foreground text-background">
+                          {user?.name?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col items-start">
+                        <span className="font-bold">{user?.name}</span>
+                        <span className="text-sm">{user?.email}</span>
+                      </div>
+                    </button>
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" className="w-60">
+                  <DropdownMenuItem asChild>
+                    <button
+                      onClick={() => {
+                        // Call your logout function here
+                        fetch("/api/auth/logout", {
+                          method: "POST",
+                          credentials: "include",
+                        }).then(() => {
+                          router.replace("/login");
+                        });
+                      }}
+                      className="flex w-full items-center "
+                    >
+                      <LogOut />
+                      <span>Logout</span>
+                    </button>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>

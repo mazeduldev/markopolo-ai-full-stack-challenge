@@ -16,10 +16,12 @@ import { Label } from "@/components/ui/label";
 import { LoginUserDto, LoginUserZodSchema } from "@/types/auth.type";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useUser } from "@/context/user-context";
 
 const LoginPage = () => {
   const router = useRouter();
   const [serverError, setServerError] = useState("");
+  const { setUser } = useUser();
 
   const {
     register,
@@ -46,7 +48,7 @@ const LoginPage = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Logged in:", data);
-        // todo: store user in global state
+        setUser(data); // Store user in global state
         router.push("/dashboard"); // Redirect to dashboard
       } else {
         const errorData = await response.json();
