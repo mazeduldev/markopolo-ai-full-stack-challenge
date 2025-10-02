@@ -17,8 +17,6 @@ import { LoginUserDto, LoginUserZodSchema } from "@/types/auth.type";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 const LoginPage = () => {
   const router = useRouter();
   const [serverError, setServerError] = useState("");
@@ -37,7 +35,7 @@ const LoginPage = () => {
 
   const onSubmit = async (formData: LoginUserDto) => {
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(`/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

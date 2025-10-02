@@ -21,8 +21,6 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 const SignupPage = () => {
   const router = useRouter();
   const [serverError, setServerError] = useState("");
@@ -47,7 +45,7 @@ const SignupPage = () => {
 
   const onSubmit = async (formData: RegisterUserFormSchemaType) => {
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
+      const response = await fetch(`/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
