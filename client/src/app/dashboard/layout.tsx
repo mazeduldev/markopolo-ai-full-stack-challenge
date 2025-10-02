@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   BrainCircuit,
+  User,
 } from "lucide-react";
 import {
   Sidebar,
@@ -25,6 +26,8 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUser } from "@/context/user-context";
 
 const navItems = [
   {
@@ -51,6 +54,7 @@ const navItems = [
 
 export default function DashboardLayout({ children }: PropsWithChildren) {
   const pathname = usePathname();
+  const { user } = useUser();
 
   return (
     <SidebarProvider>
@@ -58,9 +62,9 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton>
+              <SidebarMenuButton size={"lg"}>
                 <Link href="/dashboard" className="flex items-center space-x-2">
-                  <BrainCircuit />
+                  <BrainCircuit size={30} />
                   <span className="font-bold">AI Marketing</span>
                 </Link>
               </SidebarMenuButton>
@@ -80,7 +84,11 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
 
                   return (
                     <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton asChild isActive={isActive}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive}
+                        size={"lg"}
+                      >
                         <Link href={item.href}>
                           <Icon />
                           <span>{item.title}</span>
@@ -97,15 +105,22 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton asChild size={"lg"}>
                 <button
                   onClick={() => {
                     // Implement your logout logic here
                     console.log("Logging out...");
                   }}
                 >
-                  <LogOut />
-                  <span>Logout</span>
+                  <Avatar className="w-10 h-10">
+                    <AvatarFallback className="bg-muted-foreground text-background">
+                      {user?.name?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold">{user?.name}</span>
+                    <span className="text-sm">{user?.email}</span>
+                  </div>
                 </button>
               </SidebarMenuButton>
             </SidebarMenuItem>
