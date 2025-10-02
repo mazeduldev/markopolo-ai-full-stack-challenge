@@ -84,10 +84,10 @@ const SignupPage = () => {
               type="name"
               {...register("name")}
               placeholder="Enter your name"
-              className={errors.name ? "border-red-500" : ""}
+              className={errors.name ? "border-destructive" : ""}
             />
             {errors.name && (
-              <p className="text-sm text-red-500">{errors.name.message}</p>
+              <p className="text-sm text-destructive">{errors.name.message}</p>
             )}
           </div>
 
@@ -98,10 +98,10 @@ const SignupPage = () => {
               type="email"
               {...register("email")}
               placeholder="Enter your email"
-              className={errors.email ? "border-red-500" : ""}
+              className={errors.email ? "border-destructive" : ""}
             />
             {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
+              <p className="text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
 
@@ -112,10 +112,12 @@ const SignupPage = () => {
               type="password"
               {...register("password")}
               placeholder="Enter your password"
-              className={errors.password ? "border-red-500" : ""}
+              className={errors.password ? "border-destructive" : ""}
             />
             {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
@@ -126,10 +128,10 @@ const SignupPage = () => {
               type="password"
               {...register("confirmPassword")}
               placeholder="Confirm your password"
-              className={errors.confirmPassword ? "border-red-500" : ""}
+              className={errors.confirmPassword ? "border-destructive" : ""}
             />
             {errors.confirmPassword && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.confirmPassword.message}
               </p>
             )}
@@ -142,10 +144,10 @@ const SignupPage = () => {
               type="name"
               {...register("store.name")}
               placeholder="Enter your store name"
-              className={errors.store?.name ? "border-red-500" : ""}
+              className={errors.store?.name ? "border-destructive" : ""}
             />
             {errors.store?.name && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.store?.name.message}
               </p>
             )}
@@ -158,28 +160,30 @@ const SignupPage = () => {
               type="url"
               {...register("store.url")}
               placeholder="Enter your store URL"
-              className={errors.store?.url ? "border-red-500" : ""}
+              className={errors.store?.url ? "border-destructive" : ""}
             />
             {errors.store?.url && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-destructive">
                 {errors.store?.url.message}
               </p>
             )}
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" size="lg">
             Sign Up
           </Button>
 
           {serverError && (
-            <p className="text-sm text-red-500 text-center">{serverError}</p>
+            <p className="text-sm text-destructive text-center">
+              {serverError}
+            </p>
           )}
         </form>
 
         <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline">
+            <Link href="/login" className="text-primary hover:underline">
               Log In
             </Link>
           </p>

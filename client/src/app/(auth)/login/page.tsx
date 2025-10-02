@@ -76,10 +76,10 @@ const LoginPage = () => {
               type="email"
               {...register("email")}
               placeholder="Enter your email"
-              className={errors.email ? "border-red-500" : ""}
+              className={errors.email ? "border-destructive" : ""}
             />
             {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
+              <p className="text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
 
@@ -90,26 +90,30 @@ const LoginPage = () => {
               type="password"
               {...register("password")}
               placeholder="Enter your password"
-              className={errors.password ? "border-red-500" : ""}
+              className={errors.password ? "border-destructive" : ""}
             />
             {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" size="lg">
             Log In
           </Button>
 
           {serverError && (
-            <p className="text-sm text-red-500 text-center">{serverError}</p>
+            <p className="text-sm text-destructive text-center">
+              {serverError}
+            </p>
           )}
         </form>
 
         <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <Link href="/signup" className="text-blue-600 hover:underline">
+            <Link href="/signup" className="text-primary hover:underline">
               Sign Up
             </Link>
           </p>
