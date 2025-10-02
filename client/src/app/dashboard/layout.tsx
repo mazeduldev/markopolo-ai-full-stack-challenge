@@ -33,6 +33,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ThreadList } from "@/components/chat-history/ThreadList";
 
 const navItems = [
   {
@@ -104,7 +105,18 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+          <SidebarSeparator className="m-0" />
+
+          <SidebarGroup className="overflow-y-auto flex-1">
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <ThreadList />
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         </SidebarContent>
+
+        <SidebarSeparator className="m-0" />
 
         <SidebarFooter>
           <SidebarMenu>

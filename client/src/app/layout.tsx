@@ -3,6 +3,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Geist, Geist_Mono } from "next/font/google";
 import { UserProvider } from "@/context/user-context";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import AppProvider from "@/providers/AppProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,16 +31,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <UserProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </UserProvider>
+        <AppProvider>
+          <UserProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </UserProvider>
+        </AppProvider>
       </body>
     </html>
   );
