@@ -8,6 +8,7 @@ import { DataSummaryService } from 'src/data-ingestion/data-summary.service';
 import { CreateGoogleAdsSummaryZodSchema } from 'src/data-ingestion/dto/google-ads-summary.dto';
 import { CreateShopifySummaryZodSchema } from 'src/data-ingestion/dto/shopify-summary.dto';
 import { CreateWebsiteAnalyticsSummaryZodSchema } from 'src/data-ingestion/dto/website-analytics-summary.dto';
+import { UpdateStoreDto } from './dto/update-store.dto';
 
 @Injectable()
 export class StoreService {
@@ -41,6 +42,15 @@ export class StoreService {
     await this.userService.save(user);
 
     return newStore;
+  }
+
+  updateByUserId(userId: string, updateStoreDto: UpdateStoreDto) {
+    return this.storeRepository.update(
+      {
+        user_id: userId,
+      },
+      updateStoreDto,
+    );
   }
 
   getStoreByUserId(userId: string) {

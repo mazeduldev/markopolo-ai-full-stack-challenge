@@ -13,6 +13,7 @@ import {
   BadRequestException,
   HttpCode,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
 import {
@@ -22,10 +23,16 @@ import {
 import { ZodPipe } from 'src/pipes/zod.pipe';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
+import {
+  type UpdateStoreDto,
+  updateStoreDtoZodSchema,
+} from './dto/update-store.dto';
 
 @Controller('store')
 @UseGuards(AccessTokenGuard)
 export class StoreController {
+  private readonly logger = new Logger(StoreController.name);
+
   constructor(private readonly storeService: StoreService) {}
 
   @Post()
@@ -60,5 +67,24 @@ export class StoreController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeStoreByUser(@Req() req: AuthenticatedRequest) {
     await this.storeService.removeByUserId(req.user.id);
+  }
+
+  @Patch()
+  @UsePipes(new ZodPipe(updateStoreDtoZodSchema))
+  async updateStoreByUser(
+    @Req() req: AuthenticatedRequest,
+    @Body() updateStoreDto: UpdateStoreDto,
+  ) {
+    const updateResult = await this.storeService.updateByUserId(
+      req.user.id,
+      updateStoreDto,
+    );
+    if (!updateResult.affected || updateResult.affected === 0) {
+      throw new NotFoundException('Store not found for this user');
+    }
+    if (updateResult.affected > 1) {
+      this.logger.warn('Multiple stores updated for User ID: ' + req.user.id);
+    }
+    return updateResult.affected;
   }
 }
