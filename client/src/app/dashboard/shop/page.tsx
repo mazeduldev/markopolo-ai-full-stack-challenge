@@ -24,17 +24,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-
-interface Shop {
-  id: string;
-  user_id: string;
-  name: string;
-  url: string;
-  currency: string;
-  timezone: string;
-  created_at: string;
-  updated_at: string;
-}
+import { CreateStoreDtoType, ShopDto } from "@/types/shop.type";
 
 interface UpdateShopData {
   name?: string;
@@ -43,15 +33,32 @@ interface UpdateShopData {
   timezone?: string;
 }
 
-const fetchShop = async (): Promise<Shop> => {
+const fetchStore = async (): Promise<ShopDto> => {
   const response = await fetch("/api/store");
   if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("STORE_NOT_FOUND");
+    }
     throw new Error("Failed to fetch shop data");
   }
   return response.json();
 };
 
-const updateShop = async (data: UpdateShopData): Promise<Shop> => {
+const createStore = async (data: CreateStoreDtoType): Promise<ShopDto> => {
+  const response = await fetch("/api/store", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to create shop");
+  }
+  return response.json();
+};
+
+const updateStore = async (data: UpdateShopData): Promise<ShopDto> => {
   const response = await fetch("/api/store", {
     method: "PATCH",
     headers: {
@@ -67,7 +74,14 @@ const updateShop = async (data: UpdateShopData): Promise<Shop> => {
 
 export default function Shop() {
   const [isEditing, setIsEditing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState<UpdateShopData>({});
+  const [createFormData, setCreateFormData] = useState<CreateStoreDtoType>({
+    name: "",
+    url: "",
+    currency: "USD",
+    timezone: "UTC",
+  });
   const queryClient = useQueryClient();
 
   const {
@@ -76,11 +90,29 @@ export default function Shop() {
     error,
   } = useQuery({
     queryKey: ["shop"],
-    queryFn: fetchShop,
+    queryFn: fetchStore,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: createStore,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["shop"] });
+      setIsCreating(false);
+      setCreateFormData({
+        name: "",
+        url: "",
+        currency: "USD",
+        timezone: "UTC",
+      });
+      toast.success("Shop created successfully");
+    },
+    onError: () => {
+      toast.error("Failed to create shop");
+    },
   });
 
   const updateMutation = useMutation({
-    mutationFn: updateShop,
+    mutationFn: updateStore,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shop"] });
       setIsEditing(false);
@@ -114,6 +146,129 @@ export default function Shop() {
   const handleInputChange = (field: keyof UpdateShopData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  const handleCreateInputChange = (
+    field: keyof CreateStoreDtoType,
+    value: string,
+  ) => {
+    setCreateFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCreate = () => {
+    createMutation.mutate(createFormData);
+  };
+
+  // Show create form if store not found
+  if (error?.message === "STORE_NOT_FOUND") {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <Store className="w-8 h-8" />
+          <h1 className="text-3xl font-bold">Create Your Shop</h1>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Shop Setup</CardTitle>
+            <CardDescription>
+              Create your shop to get started with MarkoPolo AI
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="create-name"
+                  className="flex items-center gap-2 text-sm font-medium"
+                >
+                  <Store className="w-4 h-4" />
+                  Shop Name *
+                </Label>
+                <Input
+                  id="create-name"
+                  value={createFormData.name}
+                  onChange={(e) =>
+                    handleCreateInputChange("name", e.target.value)
+                  }
+                  placeholder="Enter your shop name"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="create-url"
+                  className="flex items-center gap-2 text-sm font-medium"
+                >
+                  <Globe className="w-4 h-4" />
+                  Shop URL *
+                </Label>
+                <Input
+                  id="create-url"
+                  value={createFormData.url}
+                  onChange={(e) =>
+                    handleCreateInputChange("url", e.target.value)
+                  }
+                  placeholder="https://your-shop.com"
+                  type="url"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="create-currency"
+                  className="flex items-center gap-2 text-sm font-medium"
+                >
+                  <DollarSign className="w-4 h-4" />
+                  Currency
+                </Label>
+                <Input
+                  id="create-currency"
+                  value={createFormData.currency}
+                  onChange={(e) =>
+                    handleCreateInputChange("currency", e.target.value)
+                  }
+                  placeholder="USD"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="create-timezone"
+                  className="flex items-center gap-2 text-sm font-medium"
+                >
+                  <Clock className="w-4 h-4" />
+                  Timezone
+                </Label>
+                <Input
+                  id="create-timezone"
+                  value={createFormData.timezone}
+                  onChange={(e) =>
+                    handleCreateInputChange("timezone", e.target.value)
+                  }
+                  placeholder="UTC"
+                />
+              </div>
+            </div>
+
+            <Button
+              onClick={handleCreate}
+              disabled={
+                createMutation.isPending ||
+                !createFormData.name ||
+                !createFormData.url
+              }
+              className="w-full"
+              size="lg"
+            >
+              {createMutation.isPending ? "Creating Shop..." : "Create Shop"}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
