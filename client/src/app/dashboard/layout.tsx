@@ -4,13 +4,11 @@ import { PropsWithChildren } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard,
   ShoppingCart,
   BarChart3,
-  Settings,
   LogOut,
   BrainCircuit,
-  User,
+  MessagesSquare,
 } from "lucide-react";
 import {
   Sidebar,
@@ -38,24 +36,19 @@ import {
 
 const navItems = [
   {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
+    title: "Create Campaign",
+    href: "/dashboard/thread",
+    icon: MessagesSquare,
   },
   {
-    title: "Products",
-    href: "/dashboard/products",
+    title: "Shop",
+    href: "/dashboard/shop",
     icon: ShoppingCart,
   },
   {
-    title: "Analytics",
-    href: "/dashboard/analytics",
+    title: "Data Source",
+    href: "/dashboard/data-source",
     icon: BarChart3,
-  },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
   },
 ];
 
@@ -71,7 +64,10 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size={"lg"}>
-                <Link href="/dashboard" className="flex items-center space-x-2">
+                <Link
+                  href="/dashboard/thread"
+                  className="flex items-center space-x-2"
+                >
                   <BrainCircuit size={30} />
                   <span className="font-bold">AI Marketing</span>
                 </Link>

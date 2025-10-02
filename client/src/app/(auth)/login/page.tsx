@@ -49,7 +49,7 @@ const LoginPage = () => {
         const data = await response.json();
         console.log("Logged in:", data);
         setUser(data); // Store user in global state
-        router.push("/dashboard"); // Redirect to dashboard
+        router.push("/dashboard/thread"); // Redirect to dashboard
       } else {
         const errorData = await response.json();
         setServerError(errorData.message || "Login failed");

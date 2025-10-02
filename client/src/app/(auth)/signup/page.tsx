@@ -59,7 +59,7 @@ const SignupPage = () => {
         const data = await response.json();
         console.log("Account created:", data);
         setUser(data);
-        router.push("/dashboard"); // Redirect to dashboard
+        router.push("/dashboard/thread"); // Redirect to dashboard
       } else {
         const errorData = await response.json();
         setServerError(errorData.message || "Sign up failed");
