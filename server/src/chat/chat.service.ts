@@ -207,11 +207,22 @@ export class ChatService {
     return await this.chatMessageRepository.save(message);
   }
 
-  async getChatHistory(userId: string): Promise<ChatThread[]> {
+  async getChatThreads(userId: string): Promise<ChatThread[]> {
     return await this.chatThreadRepository.find({
       where: { user_id: userId },
-      relations: ['messages'],
+      // relations: ['messages'],
       order: { created_at: 'DESC' },
     });
+  }
+
+  async getChatThreadById(threadId: string, id: string): Promise<ChatThread> {
+    const thread = await this.chatThreadRepository.findOne({
+      where: { id: threadId, user_id: id },
+      relations: ['messages'],
+    });
+    if (!thread) {
+      throw new NotFoundException('Chat thread not found');
+    }
+    return thread;
   }
 }

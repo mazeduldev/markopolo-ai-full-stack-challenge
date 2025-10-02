@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Logger,
+  Param,
   Post,
   Req,
   Sse,
@@ -62,8 +63,16 @@ export class ChatController {
   }
 
   // todo: add pagination in real world implementation
-  @Get('history')
-  getChatHistoryByUser(@Req() req: AuthenticatedRequest) {
-    return this.chatService.getChatHistory(req.user.id);
+  @Get('threads')
+  getChatThreadsByUser(@Req() req: AuthenticatedRequest) {
+    return this.chatService.getChatThreads(req.user.id);
+  }
+
+  @Get('/threads/:threadId')
+  getChatThreadById(
+    @Param('threadId') threadId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.chatService.getChatThreadById(threadId, req.user.id);
   }
 }
