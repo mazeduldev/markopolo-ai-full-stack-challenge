@@ -38,6 +38,13 @@ import {
   PowerOff,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  connectionSchema,
+  googleAdsSchema,
+  shopifySchema,
+  websiteAnalyticsSchema,
+} from "@/types/connection.type";
+import z from "zod";
 
 interface DataSourceConnection {
   id: string;
@@ -177,15 +184,51 @@ export default function DataSource() {
   };
 
   const handleCreateConnection = () => {
-    const connectionData: CreateConnectionData = {
-      type: selectedType,
-      credentials: formData.credentials || {},
-      config: {
+    try {
+      // Validate basic connection data
+      const baseValidation = connectionSchema.parse({
+        type: selectedType,
         sync_frequency: formData.sync_frequency || "daily",
         enabled_features: formData.enabled_features || [],
-      },
-    };
-    createMutation.mutate(connectionData);
+        credentials: formData.credentials || {},
+      });
+
+      // Validate credentials based on selected type
+      let credentialsValidation;
+      switch (selectedType) {
+        case "website_analytics":
+          credentialsValidation = websiteAnalyticsSchema.parse(
+            formData.credentials,
+          );
+          break;
+        case "google_ads":
+          credentialsValidation = googleAdsSchema.parse(formData.credentials);
+          break;
+        case "shopify":
+          credentialsValidation = shopifySchema.parse(formData.credentials);
+          break;
+        default:
+          throw new Error("Invalid data source type");
+      }
+
+      const connectionData: CreateConnectionData = {
+        type: selectedType,
+        credentials: credentialsValidation,
+        config: {
+          sync_frequency: baseValidation.sync_frequency,
+          enabled_features: baseValidation.enabled_features,
+        },
+      };
+
+      createMutation.mutate(connectionData);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError.message);
+      } else {
+        toast.error("Please fill in all required fields");
+      }
+    }
   };
 
   const renderCredentialFields = () => {
