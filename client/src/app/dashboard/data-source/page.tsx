@@ -2,6 +2,9 @@
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Card,
   CardContent,
@@ -38,13 +41,6 @@ import {
   PowerOff,
 } from "lucide-react";
 import { toast } from "sonner";
-import {
-  connectionSchema,
-  googleAdsSchema,
-  shopifySchema,
-  websiteAnalyticsSchema,
-} from "@/types/connection.type";
-import z from "zod";
 
 interface DataSourceConnection {
   id: string;
@@ -61,7 +57,12 @@ interface CreateConnectionData {
   };
 }
 
-const dataSourceTypes = [
+const dataSourceTypes: Array<{
+  type: DataSourceConnection["type"];
+  label: string;
+  icon: React.ComponentType<any>;
+  description: string;
+}> = [
   {
     type: "website_analytics",
     label: "Website Analytics",
@@ -81,30 +82,6 @@ const dataSourceTypes = [
     description: "Connect Shopify to sync products and orders",
   },
 ];
-
-const getAvailableFeatures = (type: DataSourceConnection["type"]) => {
-  const features = {
-    website_analytics: [
-      { id: "page_views", label: "Page Views" },
-      { id: "user_sessions", label: "User Sessions" },
-      { id: "conversion_tracking", label: "Conversion Tracking" },
-      { id: "audience_insights", label: "Audience Insights" },
-    ],
-    google_ads: [
-      { id: "campaign_performance", label: "Campaign Performance" },
-      { id: "keyword_analysis", label: "Keyword Analysis" },
-      { id: "ad_spend_tracking", label: "Ad Spend Tracking" },
-      { id: "audience_targeting", label: "Audience Targeting" },
-    ],
-    shopify: [
-      { id: "sales_data", label: "Sales Data" },
-      { id: "inventory_tracking", label: "Inventory Tracking" },
-      { id: "customer_analytics", label: "Customer Analytics" },
-      { id: "product_performance", label: "Product Performance" },
-    ],
-  };
-  return features[type] || [];
-};
 
 const fetchConnections = async (): Promise<DataSourceConnection[]> => {
   const response = await fetch("/api/data-source-connection");
@@ -143,11 +120,105 @@ const toggleConnection = async (id: string): Promise<DataSourceConnection> => {
   return response.json();
 };
 
+// Define validation schemas for each data source type
+const websiteAnalyticsSchema = z.object({
+  api_key: z.string().min(1, "API Key is required"),
+  access_token: z.string().min(1, "Access Token is required"),
+  sync_frequency: z.string().min(1, "Sync frequency is required"),
+  enabled_features: z
+    .array(z.string())
+    .min(1, "At least one feature must be enabled"),
+});
+
+const googleAdsSchema = z.object({
+  customer_id: z.string().min(1, "Customer ID is required"),
+  access_token: z.string().min(1, "Access Token is required"),
+  sync_frequency: z.string().min(1, "Sync frequency is required"),
+  enabled_features: z
+    .array(z.string())
+    .min(1, "At least one feature must be enabled"),
+});
+
+const shopifySchema = z.object({
+  shop_domain: z.string().url().min(1, "Shop Domain is required"),
+  access_token: z.string().min(1, "Access Token is required"),
+  sync_frequency: z.string().min(1, "Sync frequency is required"),
+  enabled_features: z
+    .array(z.string())
+    .min(1, "At least one feature must be enabled"),
+});
+
+type WebsiteAnalyticsForm = z.infer<typeof websiteAnalyticsSchema>;
+type GoogleAdsForm = z.infer<typeof googleAdsSchema>;
+type ShopifyForm = z.infer<typeof shopifySchema>;
+
 export default function DataSource() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState<string>("");
-  const [formData, setFormData] = useState<any>({});
+  const [selectedType, setSelectedType] =
+    useState<DataSourceConnection["type"]>();
   const queryClient = useQueryClient();
+
+  // Forms for each connection type
+  const websiteAnalyticsForm = useForm<WebsiteAnalyticsForm>({
+    resolver: zodResolver(websiteAnalyticsSchema),
+    defaultValues: {
+      api_key: "",
+      access_token: "",
+      sync_frequency: "daily",
+      enabled_features: [],
+    },
+  });
+
+  const googleAdsForm = useForm<GoogleAdsForm>({
+    resolver: zodResolver(googleAdsSchema),
+    defaultValues: {
+      customer_id: "",
+      access_token: "",
+      sync_frequency: "daily",
+      enabled_features: [],
+    },
+  });
+
+  const shopifyForm = useForm<ShopifyForm>({
+    resolver: zodResolver(shopifySchema),
+    defaultValues: {
+      shop_domain: "",
+      access_token: "",
+      sync_frequency: "daily",
+      enabled_features: [],
+    },
+  });
+
+  const isWebsiteAnalyticsForm = (
+    form: any,
+  ): form is typeof websiteAnalyticsForm => {
+    return selectedType === "website_analytics";
+  };
+
+  const isGoogleAdsForm = (
+    form: any,
+  ): form is ReturnType<typeof useForm<GoogleAdsForm>> => {
+    return selectedType === "google_ads";
+  };
+
+  const isShopifyForm = (
+    form: any,
+  ): form is ReturnType<typeof useForm<ShopifyForm>> => {
+    return selectedType === "shopify";
+  };
+
+  const getCurrentForm = () => {
+    switch (selectedType) {
+      case "website_analytics":
+        return websiteAnalyticsForm;
+      case "google_ads":
+        return googleAdsForm;
+      case "shopify":
+        return shopifyForm;
+      default:
+        return null;
+    }
+  };
 
   const { data: connections = [], isLoading } = useQuery({
     queryKey: ["connections"],
@@ -159,8 +230,7 @@ export default function DataSource() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["connections"] });
       setIsDialogOpen(false);
-      setSelectedType("");
-      setFormData({});
+      setSelectedType(undefined);
       toast.success("Data source connected successfully");
     },
     onError: () => {
@@ -184,187 +254,257 @@ export default function DataSource() {
   };
 
   const handleCreateConnection = () => {
-    try {
-      // Validate basic connection data
-      const baseValidation = connectionSchema.parse({
-        type: selectedType,
-        sync_frequency: formData.sync_frequency || "daily",
-        enabled_features: formData.enabled_features || [],
-        credentials: formData.credentials || {},
-      });
+    const currentForm = getCurrentForm();
+    if (!currentForm || !selectedType) return;
 
-      // Validate credentials based on selected type
-      let credentialsValidation;
-      switch (selectedType) {
-        case "website_analytics":
-          credentialsValidation = websiteAnalyticsSchema.parse(
-            formData.credentials,
-          );
-          break;
-        case "google_ads":
-          credentialsValidation = googleAdsSchema.parse(formData.credentials);
-          break;
-        case "shopify":
-          credentialsValidation = shopifySchema.parse(formData.credentials);
-          break;
-        default:
-          throw new Error("Invalid data source type");
-      }
+    currentForm.handleSubmit((data) => {
+      const { enabled_features, sync_frequency, ...credentials } = data;
 
       const connectionData: CreateConnectionData = {
         type: selectedType,
-        credentials: credentialsValidation,
+        credentials,
         config: {
-          sync_frequency: baseValidation.sync_frequency,
-          enabled_features: baseValidation.enabled_features,
+          sync_frequency,
+          enabled_features,
         },
       };
 
       createMutation.mutate(connectionData);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const firstError = error.errors[0];
-        toast.error(firstError.message);
-      } else {
-        toast.error("Please fill in all required fields");
-      }
-    }
+    })();
   };
 
   const renderCredentialFields = () => {
-    switch (selectedType) {
-      case "website_analytics":
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="api_key">
-                API Key <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="api_key"
-                placeholder="Enter Google Analytics API Key"
-                required
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    credentials: {
-                      ...formData.credentials,
-                      api_key: e.target.value,
-                    },
-                  })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="access_token">
-                Access Token <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="access_token"
-                placeholder="Enter Access Token"
-                required
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    credentials: {
-                      ...formData.credentials,
-                      access_token: e.target.value,
-                    },
-                  })
-                }
-              />
-            </div>
+    const currentForm = getCurrentForm();
+    if (!currentForm) return null;
+
+    if (isWebsiteAnalyticsForm(currentForm)) {
+      const {
+        register,
+        formState: { errors },
+        watch,
+        setValue,
+      } = currentForm;
+
+      return (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="api_key">
+              API Key <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="api_key"
+              placeholder="Enter Google Analytics API Key"
+              {...register("api_key")}
+            />
+            {errors.api_key && (
+              <p className="text-sm text-red-500">{errors.api_key.message}</p>
+            )}
           </div>
-        );
-      case "google_ads":
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="customer_id">
-                Customer ID <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="customer_id"
-                placeholder="123-456-7890"
-                required
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    credentials: {
-                      ...formData.credentials,
-                      customer_id: e.target.value,
-                    },
-                  })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="access_token">
-                Access Token <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="access_token"
-                placeholder="Enter Access Token"
-                required
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    credentials: {
-                      ...formData.credentials,
-                      access_token: e.target.value,
-                    },
-                  })
-                }
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="access_token">
+              Access Token <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="access_token"
+              placeholder="Enter Access Token"
+              {...register("access_token")}
+            />
+            {errors.access_token && (
+              <p className="text-sm text-red-500">
+                {errors.access_token.message}
+              </p>
+            )}
           </div>
-        );
-      case "shopify":
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="shop_domain">
-                Shop Domain <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="shop_domain"
-                placeholder="my-store.myshopify.com"
-                required
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    credentials: {
-                      ...formData.credentials,
-                      shop_domain: e.target.value,
-                    },
-                  })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="access_token">
-                Access Token <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="access_token"
-                placeholder="Enter Shopify Access Token"
-                required
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    credentials: {
-                      ...formData.credentials,
-                      access_token: e.target.value,
-                    },
-                  })
-                }
-              />
-            </div>
-          </div>
-        );
-      default:
-        return null;
+          {renderCommonFields(register, errors, watch, setValue)}
+        </div>
+      );
     }
+
+    if (isGoogleAdsForm(currentForm)) {
+      const {
+        register,
+        formState: { errors },
+        watch,
+        setValue,
+      } = currentForm;
+
+      return (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="customer_id">
+              Customer ID <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="customer_id"
+              placeholder="123-456-7890"
+              {...register("customer_id")}
+            />
+            {errors.customer_id && (
+              <p className="text-sm text-red-500">
+                {errors.customer_id.message}
+              </p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="access_token">
+              Access Token <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="access_token"
+              placeholder="Enter Access Token"
+              {...register("access_token")}
+            />
+            {errors.access_token && (
+              <p className="text-sm text-red-500">
+                {errors.access_token.message}
+              </p>
+            )}
+          </div>
+          {renderCommonFields(register, errors, watch, setValue)}
+        </div>
+      );
+    }
+
+    if (isShopifyForm(currentForm)) {
+      const {
+        register,
+        formState: { errors },
+        watch,
+        setValue,
+      } = currentForm;
+
+      return (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="shop_domain">
+              Shop Domain <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="shop_domain"
+              placeholder="https://my-store.myshopify.com"
+              {...register("shop_domain")}
+            />
+            {errors.shop_domain && (
+              <p className="text-sm text-red-500">
+                {errors.shop_domain.message}
+              </p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="access_token">
+              Access Token <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="access_token"
+              placeholder="Enter Shopify Access Token"
+              {...register("access_token")}
+            />
+            {errors.access_token && (
+              <p className="text-sm text-red-500">
+                {errors.access_token.message}
+              </p>
+            )}
+          </div>
+          {renderCommonFields(register, errors, watch, setValue)}
+        </div>
+      );
+    }
+  };
+
+  const renderCommonFields = (
+    register: any,
+    errors: any,
+    watch: any,
+    setValue: any,
+  ) => {
+    const watchedFeatures = watch("enabled_features") || [];
+
+    return (
+      <>
+        {/* Sync Frequency */}
+        <div className="space-y-2">
+          <Label htmlFor="sync_frequency">
+            Sync Frequency <span className="text-red-500">*</span>
+          </Label>
+          <select
+            id="sync_frequency"
+            {...register("sync_frequency")}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+          {errors.sync_frequency && (
+            <p className="text-sm text-red-500">
+              {errors.sync_frequency.message}
+            </p>
+          )}
+        </div>
+
+        {/* Feature Selection */}
+        <div className="space-y-2">
+          <Label className="text-base font-medium">
+            Enabled Features <span className="text-red-500">*</span>
+          </Label>
+          <div className="grid grid-cols-2 gap-3">
+            {getAvailableFeatures(selectedType).map((feature: any) => (
+              <div key={feature.id} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id={feature.id}
+                  checked={watchedFeatures.includes(feature.id)}
+                  onChange={(e) => {
+                    const updatedFeatures = e.target.checked
+                      ? [...watchedFeatures, feature.id]
+                      : watchedFeatures.filter((f: string) => f !== feature.id);
+                    setValue("enabled_features", updatedFeatures);
+                  }}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <Label
+                  htmlFor={feature.id}
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {feature.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+          {errors.enabled_features && (
+            <p className="text-sm text-red-500">
+              {errors.enabled_features.message}
+            </p>
+          )}
+        </div>
+      </>
+    );
+  };
+
+  const getAvailableFeatures = (
+    type: DataSourceConnection["type"] | undefined,
+  ) => {
+    const features = {
+      website_analytics: [
+        { id: "page_views", label: "Page Views" },
+        { id: "user_sessions", label: "User Sessions" },
+        { id: "conversion_tracking", label: "Conversion Tracking" },
+        { id: "audience_insights", label: "Audience Insights" },
+      ],
+      google_ads: [
+        { id: "campaign_performance", label: "Campaign Performance" },
+        { id: "keyword_analysis", label: "Keyword Analysis" },
+        { id: "ad_spend_tracking", label: "Ad Spend Tracking" },
+        { id: "audience_targeting", label: "Audience Targeting" },
+      ],
+      shopify: [
+        { id: "sales_data", label: "Sales Data" },
+        { id: "inventory_tracking", label: "Inventory Tracking" },
+        { id: "customer_analytics", label: "Customer Analytics" },
+        { id: "product_performance", label: "Product Performance" },
+      ],
+    };
+    return type ? features[type] : [];
   };
 
   if (isLoading) {
@@ -440,80 +580,6 @@ export default function DataSource() {
                         </DialogHeader>
                         <div className="space-y-4">
                           {renderCredentialFields()}
-                          <div className="space-y-2">
-                            <Label htmlFor="sync_frequency">
-                              Sync Frequency
-                            </Label>
-                            <Select
-                              onValueChange={(value) =>
-                                setFormData({
-                                  ...formData,
-                                  sync_frequency: value,
-                                })
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select frequency" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="hourly">Hourly</SelectItem>
-                                <SelectItem value="daily">Daily</SelectItem>
-                                <SelectItem value="weekly">Weekly</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          {/* Feature Selection */}
-                          <div className="space-y-4 mt-6">
-                            <Label className="text-base font-medium">
-                              Enabled Features{" "}
-                              <span className="text-red-500">*</span>
-                            </Label>
-                            <div className="grid grid-cols-2 gap-3">
-                              {selectedType &&
-                                getAvailableFeatures(
-                                  selectedType as DataSourceConnection["type"],
-                                ).map((feature) => (
-                                  <div
-                                    key={feature.id}
-                                    className="flex items-center space-x-2"
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      id={feature.id}
-                                      checked={
-                                        formData.enabled_features?.includes(
-                                          feature.id,
-                                        ) || false
-                                      }
-                                      onChange={(e) => {
-                                        const updatedFeatures = e.target.checked
-                                          ? [
-                                              ...(formData.enabled_features ||
-                                                []),
-                                              feature.id,
-                                            ]
-                                          : formData.enabled_features?.filter(
-                                              (f: any) => f !== feature.id,
-                                            ) || [];
-                                        setFormData({
-                                          ...formData,
-                                          enabled_features: updatedFeatures,
-                                        });
-                                      }}
-                                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                    />
-                                    <Label
-                                      htmlFor={feature.id}
-                                      className="text-sm font-normal cursor-pointer"
-                                    >
-                                      {feature.label}
-                                    </Label>
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-
                           <Button
                             onClick={handleCreateConnection}
                             disabled={createMutation.isPending}
