@@ -20,6 +20,8 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { ViewJsonDialog } from "@/components/chat-history/ViewJsonDialog";
+import { useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@/context/user-context";
 
 interface ChatMessage {
   id: string;
@@ -70,6 +72,8 @@ interface Campaign {
 }
 
 export default function ThreadPage() {
+  const { user } = useUser();
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const router = useRouter();
   const threadId = searchParams.get("id");
@@ -174,6 +178,23 @@ export default function ThreadPage() {
 
               // Update thread ID and URL on first chunk
               if (data.threadId && !currentThreadId) {
+                queryClient.setQueryData(
+                  ["threads"],
+                  (oldData: ChatThread[]) => {
+                    if (!oldData) return oldData;
+                    return [
+                      {
+                        id: data.threadId,
+                        title: userMessage.content.substring(0, 50),
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        user_id: user?.id,
+                      },
+                      ...oldData,
+                    ];
+                  },
+                );
+
                 setCurrentThreadId(data.threadId);
                 router.push(`/dashboard/thread?id=${data.threadId}`, {
                   scroll: false,
