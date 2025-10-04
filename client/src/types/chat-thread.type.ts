@@ -12,9 +12,13 @@ export type ChatMessage = {
   role: MessageRole;
   content: string;
   created_at: string;
-  updated_at: string;
-  thread_id: string;
-  user_id: string;
+  thread_id?: string | null;
+  user_id?: string | null;
+};
+
+export type StreamMessage = {
+  threadId: string;
+  chunk: string;
 };
 
 export enum MessageRole {

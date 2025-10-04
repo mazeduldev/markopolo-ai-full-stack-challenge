@@ -3,73 +3,22 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Send,
-  User,
-  Bot,
-  Calendar,
-  DollarSign,
-  Users,
-  ExternalLink,
-  MessageSquare,
-} from "lucide-react";
+import { Send, User, Bot } from "lucide-react";
 import { ViewJsonDialog } from "@/components/chat-history/ViewJsonDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@/context/user-context";
-
-interface ChatMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  created_at: string;
-  thread_id?: string | null;
-  campaign_id?: string | null;
-}
-
-interface ChatThread {
-  id: string;
-  title: string;
-  created_at: string;
-  updated_at: string;
-  user_id: string;
-  messages: ChatMessage[];
-}
-
-interface StreamMessage {
-  threadId: string;
-  chunk: string;
-}
-
-interface Campaign {
-  campaign_title: string;
-  target_audience: string;
-  message: {
-    headline: string;
-    body: string;
-    call_to_action?: {
-      label: string;
-      url: string;
-    };
-  };
-  channels: string[];
-  timeline: {
-    start_date: string;
-    end_date: string;
-  };
-  budget: string;
-  expected_metrics: {
-    open_rate: number;
-    click_rate: number;
-    conversion_rate: number;
-    roi: number;
-  };
-}
+import { Campaign } from "@/types/campaign.type";
+import {
+  ChatMessage,
+  ChatThread,
+  MessageRole,
+  StreamMessage,
+} from "@/types/chat-thread.type";
+import { CampaignView } from "@/components/chat-history/CampaignView";
 
 export default function ThreadPage() {
   const { user } = useUser();
@@ -105,7 +54,7 @@ export default function ThreadPage() {
   // Load messages from thread data
   useEffect(() => {
     if (threadData?.messages) {
-      setMessages(threadData.messages);
+      setMessages(threadData.messages ?? []);
     }
   }, [threadData]);
 
@@ -127,7 +76,7 @@ export default function ThreadPage() {
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
-      role: "user",
+      role: MessageRole.USER,
       content: currentMessage,
       created_at: new Date().toISOString(),
       thread_id: currentThreadId,
@@ -174,7 +123,7 @@ export default function ThreadPage() {
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             try {
-              const data: StreamMessage = JSON.parse(line.slice(6));
+              const data: StreamMessage = JSON.parse(line.slice(6)); // Remove "data: " prefix
 
               // Update thread ID and URL on first chunk
               if (data.threadId && !currentThreadId) {
@@ -213,10 +162,10 @@ export default function ThreadPage() {
       // Add the complete assistant message
       const assistantMessage: ChatMessage = {
         id: Date.now().toString(),
-        role: "assistant",
+        role: MessageRole.ASSISTANT,
         content: fullContent,
         created_at: new Date().toISOString(),
-        thread_id: currentThreadId || "",
+        thread_id: currentThreadId,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -237,130 +186,17 @@ export default function ThreadPage() {
     }
   };
 
-  const renderCampaign = (campaign: Campaign) => {
-    return (
-      <Card className="mt-3">
-        <CardHeader>
-          <div className="flex w-full justify-between items-center gap-2">
-            <Badge variant="default">Campaign</Badge>
-            <ViewJsonDialog campaign={campaign} />
-          </div>
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-lg flex items-center">
-              {campaign.campaign_title}
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h4 className="font-medium mb-1 flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Target Audience
-            </h4>
-            <p className="text-sm text-muted-foreground">
-              {campaign.target_audience}
-            </p>
-          </div>
-
-          <Separator />
-
-          <div>
-            <h4 className="font-medium mb-2 flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
-              Message
-            </h4>
-            <div className="space-y-2">
-              <p className="font-medium text-sm">{campaign.message.headline}</p>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {campaign.message.body}
-              </p>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4" />
-              <div>
-                <span className="font-medium">Budget:</span>
-                <p>{campaign.budget}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              <div>
-                <span className="font-medium">Timeline:</span>
-                <p>
-                  {new Date(campaign.timeline.start_date).toLocaleDateString()}{" "}
-                  - {new Date(campaign.timeline.end_date).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <span className="font-medium">Channels:</span>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {campaign.channels.map((channel) => (
-                  <Badge key={channel} variant="outline" className="text-xs">
-                    {channel}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div>
-            <h4 className="font-medium mb-2">Expected Metrics</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-              <div>
-                <span className="text-muted-foreground">Open Rate:</span>
-                <p className="font-medium">
-                  {campaign.expected_metrics.open_rate}%
-                </p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Click Rate:</span>
-                <p className="font-medium">
-                  {campaign.expected_metrics.click_rate}%
-                </p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Conversion:</span>
-                <p className="font-medium">
-                  {campaign.expected_metrics.conversion_rate}%
-                </p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">ROI:</span>
-                <p className="font-medium">{campaign.expected_metrics.roi}x</p>
-              </div>
-            </div>
-          </div>
-
-          {campaign.message.call_to_action && (
-            <Button asChild className="w-full">
-              <a
-                href={campaign.message.call_to_action.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2"
-              >
-                {campaign.message.call_to_action.label}
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-    );
-  };
-
   const renderMessage = (message: ChatMessage) => {
     const isUser = message.role === "user";
+    let campaign: Campaign | null = null;
+
+    try {
+      if (!isUser) {
+        campaign = JSON.parse(message.content) as Campaign;
+      }
+    } catch {
+      campaign = null;
+    }
 
     return (
       <div
@@ -382,16 +218,11 @@ export default function ThreadPage() {
                 <p className="text-sm leading-relaxed">{message.content}</p>
               ) : (
                 <div className="text-sm">
-                  {(() => {
-                    try {
-                      const campaign: Campaign = JSON.parse(message.content);
-                      return renderCampaign(campaign);
-                    } catch {
-                      return (
-                        <p className="leading-relaxed">{message.content}</p>
-                      );
-                    }
-                  })()}
+                  {campaign ? (
+                    <CampaignView campaign={campaign} />
+                  ) : (
+                    <p className="leading-relaxed">{message.content}</p>
+                  )}
                 </div>
               )}
               <p
