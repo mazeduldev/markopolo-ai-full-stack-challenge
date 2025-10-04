@@ -34,6 +34,8 @@ import {
   PowerOff,
 } from "lucide-react";
 import { toast } from "sonner";
+import { DataSummary } from "@/components/data-summary/DataSummary";
+import { DataSummaryResponse } from "@/types/data-summary";
 
 interface DataSourceConnection {
   id: string;
@@ -75,6 +77,32 @@ const dataSourceTypes: Array<{
     description: "Connect Shopify to sync products and orders",
   },
 ];
+
+const getAvailableFeatures = (
+  type: DataSourceConnection["type"] | undefined,
+) => {
+  const features = {
+    website_analytics: [
+      { id: "page_views", label: "Page Views" },
+      { id: "user_sessions", label: "User Sessions" },
+      { id: "conversion_tracking", label: "Conversion Tracking" },
+      { id: "audience_insights", label: "Audience Insights" },
+    ],
+    google_ads: [
+      { id: "campaign_performance", label: "Campaign Performance" },
+      { id: "keyword_analysis", label: "Keyword Analysis" },
+      { id: "ad_spend_tracking", label: "Ad Spend Tracking" },
+      { id: "audience_targeting", label: "Audience Targeting" },
+    ],
+    shopify: [
+      { id: "sales_data", label: "Sales Data" },
+      { id: "inventory_tracking", label: "Inventory Tracking" },
+      { id: "customer_analytics", label: "Customer Analytics" },
+      { id: "product_performance", label: "Product Performance" },
+    ],
+  };
+  return type ? features[type] : [];
+};
 
 const fetchConnections = async (): Promise<DataSourceConnection[]> => {
   const response = await fetch("/api/data-source-connection");
@@ -217,6 +245,18 @@ export default function DataSource() {
     queryKey: ["connections"],
     queryFn: fetchConnections,
   });
+
+  const { data: dataSummary, isLoading: dataSummaryLoading } =
+    useQuery<DataSummaryResponse>({
+      queryKey: ["data-summary"],
+      queryFn: async () => {
+        const response = await fetch(`/api/data-summary`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch data summary");
+        }
+        return response.json();
+      },
+    });
 
   const createMutation = useMutation({
     mutationFn: createConnection,
@@ -474,32 +514,6 @@ export default function DataSource() {
     );
   };
 
-  const getAvailableFeatures = (
-    type: DataSourceConnection["type"] | undefined,
-  ) => {
-    const features = {
-      website_analytics: [
-        { id: "page_views", label: "Page Views" },
-        { id: "user_sessions", label: "User Sessions" },
-        { id: "conversion_tracking", label: "Conversion Tracking" },
-        { id: "audience_insights", label: "Audience Insights" },
-      ],
-      google_ads: [
-        { id: "campaign_performance", label: "Campaign Performance" },
-        { id: "keyword_analysis", label: "Keyword Analysis" },
-        { id: "ad_spend_tracking", label: "Ad Spend Tracking" },
-        { id: "audience_targeting", label: "Audience Targeting" },
-      ],
-      shopify: [
-        { id: "sales_data", label: "Sales Data" },
-        { id: "inventory_tracking", label: "Inventory Tracking" },
-        { id: "customer_analytics", label: "Customer Analytics" },
-        { id: "product_performance", label: "Product Performance" },
-      ],
-    };
-    return type ? features[type] : [];
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -522,8 +536,8 @@ export default function DataSource() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2">
+    <div className="space-y-6 flex flex-col flex-1 h-full">
+      <div className="flex items-center space-x-2">
         <Database className="w-8 h-8" />
         <h1 className="text-3xl font-bold">Data Sources</h1>
       </div>
@@ -610,6 +624,9 @@ export default function DataSource() {
             </Card>
           );
         })}
+      </div>
+      <div className="flex-1">
+        {!dataSummaryLoading && <DataSummary data={dataSummary} />}
       </div>
     </div>
   );
