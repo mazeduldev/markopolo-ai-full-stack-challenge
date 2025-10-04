@@ -41,7 +41,7 @@ export function ThreadList() {
             className="h-auto py-3"
           >
             <Link
-              href={`/dashboard/thread?threadId=${thread.id}`}
+              href={`/dashboard/thread?id=${thread.id}`}
               className="flex flex-col items-start gap-1"
             >
               <span className="font-bold text-sm line-clamp-1">
