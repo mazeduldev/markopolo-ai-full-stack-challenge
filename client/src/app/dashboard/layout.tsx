@@ -4,11 +4,11 @@ import { PropsWithChildren } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  ShoppingCart,
-  BarChart3,
   LogOut,
   BrainCircuit,
   MessagesSquare,
+  Store,
+  Database,
 } from "lucide-react";
 import {
   Sidebar,
@@ -22,9 +22,8 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarSeparator,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import { useUser } from "@/context/user-context";
 import {
@@ -44,12 +43,12 @@ const navItems = [
   {
     title: "Shop",
     href: "/dashboard/shop",
-    icon: ShoppingCart,
+    icon: Store,
   },
   {
     title: "Data Source",
     href: "/dashboard/data-source",
-    icon: BarChart3,
+    icon: Database,
   },
 ];
 
@@ -161,9 +160,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
-      <main className="flex-1">
-        <div className="p-6">{children}</div>
-      </main>
+      <main className="flex-1 py-6 px-10 h-svh">{children}</main>
     </SidebarProvider>
   );
 }

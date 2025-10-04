@@ -7,8 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, User, Bot } from "lucide-react";
-import { ViewJsonDialog } from "@/components/chat-history/ViewJsonDialog";
+import { Send, User, Bot, MessagesSquare } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@/context/user-context";
 import { Campaign } from "@/types/campaign.type";
@@ -254,21 +253,24 @@ export default function ThreadPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen max-h-screen">
+    <div className="flex flex-col flex-1 h-full space-y-6">
       {/* Header */}
-      <div className="border-b p-4 bg-background">
-        <h1 className="text-xl font-semibold">
-          {threadData?.title || "New Chat"}
-        </h1>
+      <div className="bg-background">
+        <div className="flex items-center gap-2">
+          <MessagesSquare className="w-8 h-8" />
+          <h1 className="text-3xl font-bold">
+            {threadData?.title || "New Chat"}
+          </h1>
+        </div>
         {threadData?.created_at && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground ml-10">
             Created {new Date(threadData.created_at).toLocaleDateString()}
           </p>
         )}
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4 border rounded-xl h-[500]">
         {messages.length === 0 && !isStreaming && (
           <div className="text-center text-muted-foreground mt-12">
             <Bot className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -334,7 +336,7 @@ export default function ThreadPage() {
       </ScrollArea>
 
       {/* Input */}
-      <div className="border-t p-4 bg-background">
+      <div className="bg-background">
         <div className="flex gap-2">
           <Textarea
             value={currentMessage}
