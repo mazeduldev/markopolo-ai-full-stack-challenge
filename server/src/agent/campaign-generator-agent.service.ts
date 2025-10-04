@@ -72,6 +72,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
       - Fetch relevant data of the store using "fetch_store_data" tool and based on that data generate marketing campaign.
       - If the tool returns null, then handoff to "Insufficient Data Responder Agent".
       - If you get sufficient data for generating campaign, then provide the output in the specified JSON format.
+      - To achieve your goal always focus on "right time, right channel, right message, for the right audience".
       `,
       tools: [
         tool({
