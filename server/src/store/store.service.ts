@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { Repository } from 'typeorm';
 import { Store } from './entities/store.entity';
@@ -9,6 +14,11 @@ import { CreateGoogleAdsSummaryZodSchema } from 'src/data-ingestion/dto/google-a
 import { CreateShopifySummaryZodSchema } from 'src/data-ingestion/dto/shopify-summary.dto';
 import { CreateWebsiteAnalyticsSummaryZodSchema } from 'src/data-ingestion/dto/website-analytics-summary.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
+import { DataSourceConnectionService } from 'src/data-ingestion/data-source-connection.service';
+import {
+  ConnectionStatus,
+  DataSourceType,
+} from 'src/data-ingestion/dto/data-source-connection.dto';
 
 @Injectable()
 export class StoreService {
@@ -17,6 +27,8 @@ export class StoreService {
     private readonly storeRepository: Repository<Store>,
     private readonly userService: UserService,
     private readonly dataSummaryService: DataSummaryService,
+    @Inject(forwardRef(() => DataSourceConnectionService))
+    private readonly dataSourceConnectionService: DataSourceConnectionService,
   ) {}
 
   async createAndSave(createStoreDto: CreateStoreDto, userId: string) {
@@ -72,11 +84,44 @@ export class StoreService {
       throw new NotFoundException('Store not found');
     }
 
-    const [google_ads, shopify, website_analytics] = await Promise.all([
-      this.dataSummaryService.getLatestGoogleAdsSummaryByUserId(userId),
-      this.dataSummaryService.getLatestShopifySummaryByUserId(userId),
-      this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByUserId(userId),
-    ]);
+    const connections = (
+      await this.dataSourceConnectionService.getConnections(userId)
+    ).filter((c) => c.status === ConnectionStatus.CONNECTED);
+
+    if (connections.length === 0) {
+      throw new NotFoundException('No data source connections found for user');
+    }
+
+    const promises = connections.map((connection) => {
+      switch (connection.type) {
+        case DataSourceType.GOOGLE_ADS:
+          return this.dataSummaryService.getLatestGoogleAdsSummaryByUserId(
+            userId,
+          );
+        case DataSourceType.SHOPIFY:
+          return this.dataSummaryService.getLatestShopifySummaryByUserId(
+            userId,
+          );
+        case DataSourceType.WEBSITE_ANALYTICS:
+          return this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByUserId(
+            userId,
+          );
+        default:
+          return Promise.resolve(null);
+      }
+    });
+
+    const results = await Promise.all(promises);
+
+    const processedResults = results
+      .filter((result) => result != null)
+      .reduce(
+        (acc, curr) => {
+          acc = { ...acc, ...curr };
+          return acc;
+        },
+        {} as Record<'google_ads' | 'shopify' | 'website_analytics', unknown>,
+      );
 
     return {
       store: {
@@ -85,11 +130,7 @@ export class StoreService {
         currency: store.currency,
         timezone: store.timezone,
       },
-      google_ads: CreateGoogleAdsSummaryZodSchema.parse(google_ads.google_ads),
-      shopify: CreateShopifySummaryZodSchema.parse(shopify.shopify),
-      website_analytics: CreateWebsiteAnalyticsSummaryZodSchema.parse(
-        website_analytics.website_analytics,
-      ),
+      ...processedResults,
     };
   }
 }

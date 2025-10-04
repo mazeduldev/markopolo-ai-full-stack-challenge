@@ -10,7 +10,10 @@ import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import { DataSummaryService } from './data-summary.service';
 import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import { DataSourceConnectionService } from './data-source-connection.service';
-import { DataSourceType } from './dto/data-source-connection.dto';
+import {
+  ConnectionStatus,
+  DataSourceType,
+} from './dto/data-source-connection.dto';
 
 @UseGuards(AccessTokenGuard)
 @Controller('data-summary')
@@ -102,8 +105,11 @@ export class DataSummaryController {
   @Get()
   async getAvailableDataSummaryForStore(@Req() req: AuthenticatedRequest) {
     const userId = req.user.id;
-    const connections =
-      await this.dataSourceConnectionService.getConnections(userId);
+
+    const connections = (
+      await this.dataSourceConnectionService.getConnections(userId)
+    ).filter((c) => c.status === ConnectionStatus.CONNECTED);
+
     if (connections.length === 0) {
       throw new NotFoundException('No data source connections found for user');
     }

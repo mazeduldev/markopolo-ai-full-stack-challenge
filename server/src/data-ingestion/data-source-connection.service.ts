@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -49,6 +51,7 @@ export class DataSourceConnectionService {
     @InjectRepository(WebsiteAnalyticsSummary)
     private readonly websiteAnalyticsSummaryRepository: Repository<WebsiteAnalyticsSummary>,
 
+    @Inject(forwardRef(() => StoreService))
     private readonly storeService: StoreService,
     private readonly mockDataGeneratorService: AiMockDataGeneratorService,
   ) {}

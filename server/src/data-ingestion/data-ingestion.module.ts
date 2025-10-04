@@ -24,6 +24,6 @@ import { AiMockDataGeneratorModule } from 'src/ai-mock-data-generator/ai-mock-da
   ],
   controllers: [DataSourceConnectionController, DataSummaryController],
   providers: [DataSourceConnectionService, DataSummaryService],
-  exports: [DataSummaryService],
+  exports: [DataSummaryService, DataSourceConnectionService],
 })
 export class DataIngestionModule {}
