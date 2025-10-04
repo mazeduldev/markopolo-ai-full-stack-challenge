@@ -5,15 +5,55 @@ services:
     image: postgres:17
     container_name: pg17
     restart: unless-stopped
-    env_file: .env
+    env_file:
+      - ./server/.env
     environment:
-      POSTGRES_USER: ${DB_USER-pguser}
-      POSTGRES_PASSWORD: ${DB_PASSWORD-pgpassword}
-      POSTGRES_DB: ${DB_NAME-markopolo}
+      POSTGRES_USER: ${DB_USER:-pguser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pgpassword}
+      POSTGRES_DB: ${DB_NAME:-markopolo}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USERNAME:-pguser} -d ${DB_NAME:-markopolo}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: nest_server
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      - DB_HOST=localhost
+      - PORT=8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: next_client
+    restart: unless-stopped
+    environment:
+      - API_URL=http://server:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
 
 volumes:
   pgdata:
