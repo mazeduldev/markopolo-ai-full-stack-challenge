@@ -12,6 +12,8 @@ import z from 'zod';
 export class CampaignGeneratorAgentService implements OnModuleInit {
   private readonly logger = new Logger(CampaignGeneratorAgentService.name);
 
+  private triageAgent: Agent<unknown, AgentOutputType<string>>;
+
   private campaignGeneratorAgent: Agent<
     unknown,
     AgentOutputType<CreateCampaignDto>
@@ -22,6 +24,8 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
     AgentOutputType<string>
   >;
 
+  private contextCollectorAgent: Agent<unknown, AgentOutputType<string>>;
+
   constructor(private readonly storeService: StoreService) {}
 
   onModuleInit() {
@@ -29,6 +33,25 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
       name: 'Insufficient Data Responder Agent',
       instructions: `You are an agent that responds to users when there is insufficient data to generate a marketing campaign.
       - Your task is to inform the user to check their store connection in plain text.
+      `,
+      outputType: 'text',
+      model: 'gpt-5-nano',
+      modelSettings: {
+        reasoning: {
+          effort: 'minimal',
+        },
+        text: {
+          verbosity: 'low',
+        },
+      },
+    });
+
+    this.contextCollectorAgent = Agent.create({
+      name: 'Context Collector Agent',
+      instructions: `You are a context collector agent.
+      - Your task is to gather additional context from the user to aid in marketing campaign generation.
+      - Ask relevant questions to understand the user's business, target audience, and marketing goals.
+      - Provide the output in plain text format.
       `,
       outputType: 'text',
       model: 'gpt-5-nano',
@@ -88,6 +111,29 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
       },
       handoffs: [handoff(this.insufficientDataResponderAgent)],
     });
+
+    this.triageAgent = Agent.create({
+      name: 'Triage Agent',
+      instructions: `You are a triage agent.
+      - Your task is to determine if the user is directly asking for a marketing campaign.
+      - If they are, handoff to "Campaign Generator Agent".
+      - If they are not, handoff to "Context Collector Agent".
+      `,
+      outputType: 'text',
+      model: 'gpt-5-nano',
+      modelSettings: {
+        reasoning: {
+          effort: 'minimal',
+        },
+        text: {
+          verbosity: 'low',
+        },
+      },
+      handoffs: [
+        handoff(this.contextCollectorAgent),
+        handoff(this.campaignGeneratorAgent),
+      ],
+    });
   }
 
   private isStringOutput(output: unknown): output is string {
@@ -99,10 +145,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
     userId: string,
   ): Promise<CreateCampaignDto | string> {
     this.logger.log(`Generating campaign for prompt: ${prompt}`);
-    const result = await run(
-      this.campaignGeneratorAgent,
-      `${prompt}\nUser ID: ${userId}`,
-    );
+    const result = await run(this.triageAgent, `${prompt}\nUser ID: ${userId}`);
 
     if (this.isStringOutput(result.finalOutput)) {
       return result.finalOutput;
@@ -126,7 +169,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
       const runStream = async () => {
         try {
           const stream = await run(
-            this.campaignGeneratorAgent,
+            this.triageAgent,
             `${prompt}\nUser ID: ${userId}`,
             {
               stream: true,
