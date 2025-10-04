@@ -33,7 +33,7 @@ export class ChatController {
   ): Promise<{ threadId: string; content: CreateCampaignDto | string }> {
     const campaign = await this.chatService.generateCampaign(
       body.content,
-      body.threadId,
+      body.thread_id,
       req.user.id,
     );
     return campaign;
@@ -47,7 +47,7 @@ export class ChatController {
     @Req() req: AuthenticatedRequest,
   ): Observable<MessageEvent> {
     return this.chatService
-      .generateCampaignStream(body.content, body.threadId, req.user.id)
+      .generateCampaignStream(body.content, body.thread_id, req.user.id)
       .pipe(
         map(
           (data) =>

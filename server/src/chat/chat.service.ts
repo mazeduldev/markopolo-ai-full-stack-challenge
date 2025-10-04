@@ -103,6 +103,7 @@ export class ChatService {
 
       initializeChat()
         .then((thread) => {
+          observer.next({ data: '', threadId: thread.id }); // Initial empty message with threadId
           stream
             .pipe(
               tap((chunk) => {
@@ -110,7 +111,7 @@ export class ChatService {
               }),
               map((chunk: { data: string }) => ({
                 data: chunk.data,
-                threadId: thread.id,
+                threadId: '',
               })),
             )
             .subscribe({
