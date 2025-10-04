@@ -95,7 +95,7 @@ export default function ThreadPage() {
         },
         body: JSON.stringify({
           content: currentMessage,
-          threadId: currentThreadId,
+          thread_id: currentThreadId,
         }),
       });
 
@@ -213,7 +213,7 @@ export default function ThreadPage() {
 
         <div className={`max-w-[85%] ${isUser ? "order-first" : ""}`}>
           <Card className={isUser ? "bg-blue-500 text-white" : ""}>
-            <CardContent className="p-4">
+            <CardContent className="px-4">
               {isUser ? (
                 <p className="text-sm leading-relaxed">{message.content}</p>
               ) : (
@@ -279,6 +279,38 @@ export default function ThreadPage() {
 
         {messages.map(renderMessage)}
 
+        {/* AI Thinking indicator */}
+        {isStreaming && !streamingContent && (
+          <div className="flex gap-3 mb-4 justify-start">
+            <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <Bot className="w-4 h-4 text-white" />
+            </div>
+            <div className="max-w-[85%]">
+              <Card>
+                <CardContent className="px-4">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>Thinking</span>
+                    <div className="flex gap-1">
+                      <div
+                        className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0ms" }}
+                      ></div>
+                      <div
+                        className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "150ms" }}
+                      ></div>
+                      <div
+                        className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "300ms" }}
+                      ></div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
         {/* Streaming message */}
         {isStreaming && streamingContent && (
           <div className="flex gap-3 mb-4 justify-start">
@@ -287,7 +319,7 @@ export default function ThreadPage() {
             </div>
             <div className="max-w-[85%]">
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="px-4">
                   <div className="text-sm">
                     <p className="leading-relaxed">{streamingContent}</p>
                     <div className="inline-block w-2 h-4 bg-blue-500 ml-1 animate-pulse" />
