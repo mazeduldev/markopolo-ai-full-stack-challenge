@@ -73,9 +73,18 @@ export class StoreService {
     }
 
     const [google_ads, shopify, website_analytics] = await Promise.all([
-      this.dataSummaryService.getLatestGoogleAdsSummaryByStore(store.id),
-      this.dataSummaryService.getLatestShopifySummaryByStore(store.id),
-      this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByStore(store.id),
+      this.dataSummaryService.getLatestGoogleAdsSummaryByStoreIdAndUserId(
+        store.id,
+        userId,
+      ),
+      this.dataSummaryService.getLatestShopifySummaryByStoreIdAndUserId(
+        store.id,
+        userId,
+      ),
+      this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByStoreIdAndUserId(
+        store.id,
+        userId,
+      ),
     ]);
 
     return {
@@ -85,10 +94,11 @@ export class StoreService {
         currency: store.currency,
         timezone: store.timezone,
       },
-      google_ads: CreateGoogleAdsSummaryZodSchema.parse(google_ads),
-      shopify: CreateShopifySummaryZodSchema.parse(shopify),
-      website_analytics:
-        CreateWebsiteAnalyticsSummaryZodSchema.parse(website_analytics),
+      google_ads: CreateGoogleAdsSummaryZodSchema.parse(google_ads.google_ads),
+      shopify: CreateShopifySummaryZodSchema.parse(shopify.shopify),
+      website_analytics: CreateWebsiteAnalyticsSummaryZodSchema.parse(
+        website_analytics.website_analytics,
+      ),
     };
   }
 }

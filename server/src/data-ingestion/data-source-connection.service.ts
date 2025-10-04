@@ -12,7 +12,6 @@ import {
   CreateDataSourceConnectionDto,
   DataSourceConnectionViewType,
   dataSourceConnectionViewZodSchema,
-  dataSourceConnectionZodSchema,
   DataSourceType,
 } from './dto/data-source-connection.dto';
 import { StoreService } from 'src/store/store.service';
@@ -185,5 +184,20 @@ export class DataSourceConnectionService {
     return connections.map((connection) =>
       dataSourceConnectionViewZodSchema.parse(connection),
     );
+  }
+
+  async getConnectionByTypeAndUserId(
+    type: DataSourceType,
+    userId: string,
+  ): Promise<DataSourceConnectionViewType | null> {
+    const connection = await this.dataSourceConnectionRepository.findOne({
+      where: { type, user_id: userId },
+    });
+
+    if (!connection) {
+      return null;
+    }
+
+    return dataSourceConnectionViewZodSchema.parse(connection);
   }
 }

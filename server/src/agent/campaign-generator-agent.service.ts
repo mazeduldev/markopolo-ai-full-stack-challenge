@@ -63,6 +63,9 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
             try {
               const storeData =
                 await this.storeService.getStoreDataForCampaignCreation(userId);
+              this.logger.log(
+                `Fetched store data for userId ${userId}: ${JSON.stringify(storeData)}`,
+              );
               return storeData;
             } catch (error) {
               this.logger.error(

@@ -6,9 +6,9 @@ import { DataSourceConnectionService } from './data-source-connection.service';
 import { GoogleAdsSummary } from './entities/google-ads-summary.entity';
 import { ShopifySummary } from './entities/shopify-summary.entity';
 import { WebsiteAnalyticsSummary } from './entities/website-analytics-summary.entity';
-import { AgentModule } from 'src/agent/agent.module';
 import { StoreModule } from 'src/store/store.module';
 import { DataSummaryService } from './data-summary.service';
+import { DataSummaryController } from './data-summary.controller';
 import { AiMockDataGeneratorModule } from 'src/ai-mock-data-generator/ai-mock-data-generator.module';
 
 @Module({
@@ -22,7 +22,7 @@ import { AiMockDataGeneratorModule } from 'src/ai-mock-data-generator/ai-mock-da
     AiMockDataGeneratorModule,
     forwardRef(() => StoreModule),
   ],
-  controllers: [DataSourceConnectionController],
+  controllers: [DataSourceConnectionController, DataSummaryController],
   providers: [DataSourceConnectionService, DataSummaryService],
   exports: [DataSummaryService],
 })

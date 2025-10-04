@@ -63,6 +63,11 @@ export class StoreController {
     return store;
   }
 
+  @Get('campaign-creation-data')
+  async getStoreDataForCampaignCreation(@Req() req: AuthenticatedRequest) {
+    return this.storeService.getStoreDataForCampaignCreation(req.user.id);
+  }
+
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeStoreByUser(@Req() req: AuthenticatedRequest) {

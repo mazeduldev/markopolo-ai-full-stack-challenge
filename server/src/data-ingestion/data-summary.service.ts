@@ -18,24 +18,42 @@ export class DataSummaryService {
     private readonly websiteAnalyticsSummaryRepository: Repository<WebsiteAnalyticsSummary>,
   ) {}
 
-  async getLatestGoogleAdsSummaryByStore(storeId: string) {
-    return this.googleAdsSummaryRepository.findOne({
-      where: { store_id: storeId },
+  async getLatestGoogleAdsSummaryByStoreIdAndUserId(
+    storeId: string,
+    userId: string,
+  ) {
+    const summary = await this.googleAdsSummaryRepository.findOne({
+      where: { store: { id: storeId, user_id: userId } },
       order: { created_at: 'DESC' },
     });
+    return {
+      google_ads: summary,
+    };
   }
 
-  async getLatestShopifySummaryByStore(storeId: string) {
-    return this.shopifySummaryRepository.findOne({
-      where: { store_id: storeId },
+  async getLatestShopifySummaryByStoreIdAndUserId(
+    storeId: string,
+    userId: string,
+  ) {
+    const summary = await this.shopifySummaryRepository.findOne({
+      where: { store: { id: storeId, user_id: userId } },
       order: { created_at: 'DESC' },
     });
+    return {
+      shopify: summary,
+    };
   }
 
-  async getLatestWebsiteAnalyticsSummaryByStore(storeId: string) {
-    return this.websiteAnalyticsSummaryRepository.findOne({
-      where: { store_id: storeId },
+  async getLatestWebsiteAnalyticsSummaryByStoreIdAndUserId(
+    storeId: string,
+    userId: string,
+  ) {
+    const summary = await this.websiteAnalyticsSummaryRepository.findOne({
+      where: { store: { id: storeId, user_id: userId } },
       order: { created_at: 'DESC' },
     });
+    return {
+      website_analytics: summary,
+    };
   }
 }
