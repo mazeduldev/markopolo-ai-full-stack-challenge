@@ -20,11 +20,8 @@ export class DataSummaryController {
     private readonly dataSourceConnectionService: DataSourceConnectionService,
   ) {}
 
-  @Get('google-ads/:storeId')
-  async getLatestGoogleAdsSummaryByStore(
-    @Param('storeId') storeId: string,
-    @Req() req: AuthenticatedRequest,
-  ) {
+  @Get('google-ads')
+  async getLatestGoogleAdsSummaryByStore(@Req() req: AuthenticatedRequest) {
     const userId = req.user.id;
     const connection =
       await this.dataSourceConnectionService.getConnectionByTypeAndUserId(
@@ -39,10 +36,7 @@ export class DataSummaryController {
     }
 
     const dataSummary =
-      await this.dataSummaryService.getLatestGoogleAdsSummaryByStoreIdAndUserId(
-        storeId,
-        userId,
-      );
+      await this.dataSummaryService.getLatestGoogleAdsSummaryByUserId(userId);
 
     if (!dataSummary) {
       throw new NotFoundException('No Google Ads summary found for the store');
@@ -51,11 +45,8 @@ export class DataSummaryController {
     return dataSummary;
   }
 
-  @Get('shopify/:storeId')
-  async getLatestShopifySummaryByStore(
-    @Param('storeId') storeId: string,
-    @Req() req: AuthenticatedRequest,
-  ) {
+  @Get('shopify')
+  async getLatestShopifySummaryByStore(@Req() req: AuthenticatedRequest) {
     const userId = req.user.id;
     const connection =
       await this.dataSourceConnectionService.getConnectionByTypeAndUserId(
@@ -68,10 +59,7 @@ export class DataSummaryController {
     }
 
     const dataSummary =
-      await this.dataSummaryService.getLatestShopifySummaryByStoreIdAndUserId(
-        storeId,
-        userId,
-      );
+      await this.dataSummaryService.getLatestShopifySummaryByUserId(userId);
 
     if (!dataSummary) {
       throw new NotFoundException('No Shopify summary found for the store');
@@ -80,9 +68,8 @@ export class DataSummaryController {
     return dataSummary;
   }
 
-  @Get('website-analytics/:storeId')
+  @Get('website-analytics')
   async getLatestWebsiteAnalyticsSummaryByStore(
-    @Param('storeId') storeId: string,
     @Req() req: AuthenticatedRequest,
   ) {
     const userId = req.user.id;
@@ -99,8 +86,7 @@ export class DataSummaryController {
     }
 
     const dataSummary =
-      await this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByStoreIdAndUserId(
-        storeId,
+      await this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByUserId(
         userId,
       );
 
@@ -113,11 +99,8 @@ export class DataSummaryController {
     return dataSummary;
   }
 
-  @Get('/store/:storeId')
-  async getAvailableDataSummaryForStore(
-    @Param('storeId') storeId: string,
-    @Req() req: AuthenticatedRequest,
-  ) {
+  @Get()
+  async getAvailableDataSummaryForStore(@Req() req: AuthenticatedRequest) {
     const userId = req.user.id;
     const connections =
       await this.dataSourceConnectionService.getConnections(userId);
@@ -128,18 +111,15 @@ export class DataSummaryController {
     const promises = connections.map((connection) => {
       switch (connection.type) {
         case DataSourceType.GOOGLE_ADS:
-          return this.dataSummaryService.getLatestGoogleAdsSummaryByStoreIdAndUserId(
-            storeId,
+          return this.dataSummaryService.getLatestGoogleAdsSummaryByUserId(
             userId,
           );
         case DataSourceType.SHOPIFY:
-          return this.dataSummaryService.getLatestShopifySummaryByStoreIdAndUserId(
-            storeId,
+          return this.dataSummaryService.getLatestShopifySummaryByUserId(
             userId,
           );
         case DataSourceType.WEBSITE_ANALYTICS:
-          return this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByStoreIdAndUserId(
-            storeId,
+          return this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByUserId(
             userId,
           );
         default:

@@ -73,18 +73,9 @@ export class StoreService {
     }
 
     const [google_ads, shopify, website_analytics] = await Promise.all([
-      this.dataSummaryService.getLatestGoogleAdsSummaryByStoreIdAndUserId(
-        store.id,
-        userId,
-      ),
-      this.dataSummaryService.getLatestShopifySummaryByStoreIdAndUserId(
-        store.id,
-        userId,
-      ),
-      this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByStoreIdAndUserId(
-        store.id,
-        userId,
-      ),
+      this.dataSummaryService.getLatestGoogleAdsSummaryByUserId(userId),
+      this.dataSummaryService.getLatestShopifySummaryByUserId(userId),
+      this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByUserId(userId),
     ]);
 
     return {
