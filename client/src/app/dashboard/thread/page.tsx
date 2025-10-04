@@ -105,6 +105,14 @@ export default function ThreadPage() {
     }
   }, [threadData]);
 
+  // Clear messages for new thread
+  useEffect(() => {
+    if (!threadId) {
+      setMessages([]);
+      setCurrentThreadId(null);
+    }
+  }, [threadId]);
+
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
