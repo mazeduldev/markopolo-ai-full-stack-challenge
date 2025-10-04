@@ -29,7 +29,7 @@ export class ChatService {
 
   async generateCampaign(
     prompt: string,
-    threadId: string | undefined,
+    threadId: string | undefined | null,
     userId: string,
   ): Promise<{ threadId: string; content: string | CreateCampaignDto }> {
     // Create or get existing thread
@@ -80,7 +80,7 @@ export class ChatService {
 
   generateCampaignStream(
     prompt: string,
-    threadId: string | undefined,
+    threadId: string | undefined | null,
     userId: string,
   ): Observable<{ data: string; threadId: string }> {
     let assistantMessage: ChatMessage;
@@ -162,7 +162,7 @@ export class ChatService {
 
   private async getOrCreateThread(
     userId: string,
-    threadId: string | undefined,
+    threadId: string | undefined | null,
     prompt: string,
   ): Promise<ChatThread> {
     if (threadId) {
