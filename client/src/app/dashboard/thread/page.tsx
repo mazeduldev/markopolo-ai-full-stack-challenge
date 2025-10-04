@@ -17,7 +17,9 @@ import {
   DollarSign,
   Users,
   ExternalLink,
+  MessageSquare,
 } from "lucide-react";
+import { ViewJsonDialog } from "@/components/chat-history/ViewJsonDialog";
 
 interface ChatMessage {
   id: string;
@@ -210,10 +212,15 @@ export default function ThreadPage() {
     return (
       <Card className="mt-3">
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            {campaign.campaign_title}
-            <Badge variant="secondary">Campaign</Badge>
-          </CardTitle>
+          <div className="flex w-full justify-between items-center gap-2">
+            <Badge variant="default">Campaign</Badge>
+            <ViewJsonDialog campaign={campaign} />
+          </div>
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="text-lg flex items-center">
+              {campaign.campaign_title}
+            </CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -229,7 +236,10 @@ export default function ThreadPage() {
           <Separator />
 
           <div>
-            <h4 className="font-medium mb-2">Message</h4>
+            <h4 className="font-medium mb-2 flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              Message
+            </h4>
             <div className="space-y-2">
               <p className="font-medium text-sm">{campaign.message.headline}</p>
               <p className="text-sm text-muted-foreground leading-relaxed">
