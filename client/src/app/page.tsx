@@ -12,7 +12,6 @@ import {
   Zap,
   Target,
   TrendingUp,
-  Users,
   BarChart3,
   Sparkles,
 } from "lucide-react";
@@ -167,8 +166,8 @@ export default function Home() {
             Ready to Revolutionize Your Marketing?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of successful marketers who've already transformed
-            their campaigns with AI
+            Join thousands of successful marketers who&apos;ve already
+            transformed their campaigns with AI
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">

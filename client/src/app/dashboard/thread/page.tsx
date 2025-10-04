@@ -153,6 +153,7 @@ export default function ThreadPage() {
               setStreamingContent(fullContent);
             } catch (e) {
               // Skip invalid JSON
+              console.log("Skipping invalid JSON chunk", e);
             }
           }
         }

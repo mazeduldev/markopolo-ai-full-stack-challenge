@@ -74,7 +74,6 @@ const updateStore = async (data: UpdateShopData): Promise<ShopDto> => {
 
 export default function Shop() {
   const [isEditing, setIsEditing] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState<UpdateShopData>({});
   const [createFormData, setCreateFormData] = useState<CreateStoreDtoType>({
     name: "",
@@ -97,7 +96,6 @@ export default function Shop() {
     mutationFn: createStore,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shop"] });
-      setIsCreating(false);
       setCreateFormData({
         name: "",
         url: "",
