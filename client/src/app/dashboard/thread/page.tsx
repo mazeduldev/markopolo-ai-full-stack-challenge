@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,7 +19,26 @@ import {
 } from "@/types/chat-thread.type";
 import { CampaignView } from "@/components/chat-history/CampaignView";
 
-export default function ThreadPage() {
+// A component to display while the client component is loading
+function ThreadPageSkeleton() {
+  return (
+    <div className="p-4 md:p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Thread...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function ThreadPageContent() {
   const { user } = useUser();
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
@@ -258,16 +277,11 @@ export default function ThreadPage() {
       {/* Header */}
       <div className="bg-background">
         <div className="flex items-center gap-2">
-          <MessagesSquare className="w-8 h-8" />
+          <MessagesSquare className="w-8 h-8 shrink-0" />
           <h1 className="text-3xl font-bold">
             {threadData?.title || "New Chat"}
           </h1>
         </div>
-        {threadData?.created_at && (
-          <p className="text-sm text-muted-foreground ml-10">
-            Created {new Date(threadData.created_at).toLocaleDateString()}
-          </p>
-        )}
       </div>
 
       {/* Messages */}
@@ -361,5 +375,13 @@ export default function ThreadPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ThreadPage() {
+  return (
+    <Suspense fallback={<ThreadPageSkeleton />}>
+      <ThreadPageContent />
+    </Suspense>
   );
 }
