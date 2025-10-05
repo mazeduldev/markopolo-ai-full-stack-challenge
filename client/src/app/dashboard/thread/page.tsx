@@ -44,6 +44,7 @@ function ThreadPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const threadId = searchParams.get("id");
+  console.log("Thread ID from URL:", threadId);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentMessage, setCurrentMessage] = useState("");
@@ -52,6 +53,7 @@ function ThreadPageContent() {
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(
     threadId,
   );
+  console.log("Current Thread ID:", currentThreadId);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -80,8 +82,8 @@ function ThreadPageContent() {
   useEffect(() => {
     if (!threadId) {
       setMessages([]);
-      setCurrentThreadId(null);
     }
+    setCurrentThreadId(threadId);
   }, [threadId]);
 
   // Auto-scroll to bottom
