@@ -1,5 +1,5 @@
 # ---- Base ----
-FROM node:22-alpine AS base
+FROM node:22-slim AS base
 WORKDIR /usr/src/app
 RUN npm install -g pnpm
 
