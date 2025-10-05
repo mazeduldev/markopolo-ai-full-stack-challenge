@@ -4,6 +4,10 @@
 
 This repository contains my solution to the full stack development challenge for MarkoPolo AI. The project demonstrates modern web development practices and technical proficiency across frontend and backend, Database, and Agentic AI technologies.
 
+## Demo Video
+
+https://youtu.be/48Kcbrtp2y0
+
 ## Project Structure
 
 ```
