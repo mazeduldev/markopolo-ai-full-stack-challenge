@@ -100,6 +100,12 @@ pnpm run dev
 docker-compose up --build -d
 ```
 
+## API Documentation
+
+When server is running OpenApi documentation can be found at `http://localhost:8080/api`.
+
+![API Doc image](https://github.com/mazeduldev/markopolo-ai-full-stack-challenge/blob/main/API_DOC.png?raw=true)
+
 ## License
 
 This project is for evaluation purposes only.
