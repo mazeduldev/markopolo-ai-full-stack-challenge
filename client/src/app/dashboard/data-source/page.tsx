@@ -262,6 +262,7 @@ export default function DataSource() {
     mutationFn: createConnection,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["connections"] });
+      queryClient.invalidateQueries({ queryKey: ["data-summary"] });
       setIsDialogOpen(false);
       setSelectedType(undefined);
       toast.success("Data source connected successfully");
@@ -275,6 +276,7 @@ export default function DataSource() {
     mutationFn: toggleConnection,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["connections"] });
+      queryClient.invalidateQueries({ queryKey: ["data-summary"] });
       toast.success("Connection status updated");
     },
     onError: () => {
