@@ -1,5 +1,12 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Agent, AgentOutputType, handoff, run, tool } from '@openai/agents';
+import {
+  Agent,
+  AgentOutputType,
+  assistant,
+  handoff,
+  run,
+  tool,
+} from '@openai/agents';
 import {
   CreateCampaignDto,
   CreateCampaignZodSchema,
@@ -24,7 +31,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
     AgentOutputType<string>
   >;
 
-  private contextCollectorAgent: Agent<unknown, AgentOutputType<string>>;
+  private generalChatAgent: Agent<unknown, AgentOutputType<string>>;
 
   constructor(private readonly storeService: StoreService) {}
 
@@ -34,6 +41,8 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
       instructions: `You are an agent that responds to users when there is insufficient data to generate a marketing campaign.
       - Your task is to inform the user to check their store connection in plain text.
       `,
+      handoffDescription:
+        'Responds to users when there is insufficient data to generate a marketing campaign.',
       outputType: 'text',
       model: 'gpt-5-nano',
       modelSettings: {
@@ -46,13 +55,16 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
       },
     });
 
-    this.contextCollectorAgent = Agent.create({
-      name: 'Context Collector Agent',
-      instructions: `You are a context collector agent.
-      - Your task is to gather additional context from the user to aid in marketing campaign generation.
-      - Ask relevant questions to understand the user's business, target audience, and marketing goals.
+    this.generalChatAgent = Agent.create({
+      name: 'General Chat Agent',
+      instructions: `You are a General Chat Agent.
+      - Your task is to continue the conversation with the user in a friendly and engaging manner.
+      - The user is not asking for a marketing campaign, so do not provide one.
+      - Always encourage the user to generate marketing campaigns.
       - Provide the output in plain text format.
       `,
+      handoffDescription:
+        'Handles general chat when the user is not asking for a marketing campaign.',
       outputType: 'text',
       model: 'gpt-5-nano',
       modelSettings: {
@@ -74,6 +86,8 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
       - If you get sufficient data for generating campaign, then provide the output in the specified JSON format.
       - To achieve your goal always focus on "right time, right channel, right message, for the right audience".
       `,
+      handoffDescription:
+        'Generates marketing campaigns based on user input and store data.',
       tools: [
         tool({
           name: 'fetch_store_data',
@@ -117,21 +131,14 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
       name: 'Triage Agent',
       instructions: `You are a triage agent.
       - Your task is to determine if the user is directly asking for a marketing campaign.
-      - If they are, handoff to "Campaign Generator Agent".
-      - If they are not, handoff to "Context Collector Agent".
+      - If they are asking to generate campaign, then handoff to "Campaign Generator Agent".
+      - If they are not, then handoff to "General Chat Agent".
+      - Do not generate any output yourself, always handoff to other agents.
       `,
       outputType: 'text',
-      model: 'gpt-5-nano',
-      modelSettings: {
-        reasoning: {
-          effort: 'minimal',
-        },
-        text: {
-          verbosity: 'low',
-        },
-      },
+      model: 'gpt-4o-mini', // gpt-5-nano performs poorly at triage
       handoffs: [
-        handoff(this.contextCollectorAgent),
+        handoff(this.generalChatAgent),
         handoff(this.campaignGeneratorAgent),
       ],
     });
@@ -177,6 +184,8 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
             },
           );
 
+          this.logger.log(`Last Agent: ${stream.lastAgent?.name}`);
+          this.logger.log(`Final Output: ${stream.finalOutput as string}`);
           const textStream = stream.toTextStream();
 
           for await (const chunk of textStream) {
