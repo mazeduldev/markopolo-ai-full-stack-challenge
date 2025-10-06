@@ -27,6 +27,75 @@ markopolo-ai-full-stack-challenge/
 - **Authentication**: JWT, Passport
 - **Deployment**: Docker, Docker Compose
 
+## Architecture
+
+### Core Components
+
+- **Frontend (Client)**: Next.js React application serving as the user interface
+- **Backend (Server)**: NestJS API server handling business logic and data operations
+- **Database**: PostgreSQL for persistent data storage
+- **Deployment**: Docker and docker-compose for containerized deployment
+
+### Agentic AI For Campaign Generation
+
+AI chat and campaign generation feature is backed by 4 AI Agents. Every agent has it's clear scope and ability to handle incoming user prompt.
+
+- **Triage Agent**:
+
+  - All incoming user prompt comes to the Triage Agent. - It is responsible to understand the intent and handoff to the appropriate agent.
+  - It can handoff to either one of these:
+    _Campaign Generator Agent_
+    _General Chat Agent_.
+  - LLM: `gpt-4o-mini`
+
+- **Campaign Generator Agent**:
+
+  - Generates marketing campaigns based on user prompt, available shop information in database, and fetched data from connected data sources.
+  - Fetch data from database using available **Tool**.
+  - Responds in structured JSON format.
+  - If there is no datasource connection available for the shop then it handoff the prompt to _Insufficient Data Responder Agent_.
+  - LLM: `gpt-5-nano`
+
+- **General Chat Agent**:
+
+  - Handles general chat when the user is not asking for a marketing campaign.
+  - Responds in plain text.
+  - LLM: `gpt-5-nano`
+
+- **Insufficient Data Responder Agent**:
+  - Responds to users when there is insufficient data to generate a marketing campaign.
+  - Responds in plain text.
+  - LLM: `gpt-5-nano`
+
+### Frontend Layer
+
+- **Next.js Framework**: Server-side rendering and routing
+- **React Components**: Modular UI components
+- **Tailwind CSS**: Utility-first styling
+- **TypeScript**: Type safety and developer experience
+
+### Backend Layer
+
+- **NestJS Framework**: Modular, scalable Node.js framework
+- **RESTful API**: Standard HTTP endpoints for client communication, and Server Sent Event (SSE) for real-time chat experience with AI
+- **JWT Authentication**: Stateless authentication using Passport
+- **Zod Validation**: Runtime type checking and input validation
+- **Data Ingestion**: For this demo project no real data ingestion is implemented. Instead of that, when user connects a datasource, backend generate mock data using OpenAI models.
+
+### Data Layer
+
+- **PostgreSQL**: Relational database for structured data
+
+### External Services
+
+- **OpenAI Integration**: AI capabilities through OpenAI SDK and Agents SDK
+
+### Security & Validation
+
+- JWT-based authentication for secure API access
+- Input validation at API boundaries using Zod schemas
+- Environment-based configuration management using Nest.js ConfigModule
+
 ## Features
 
 - User authentication and authorization using JWT
@@ -108,7 +177,7 @@ docker-compose up --build -d
 
 When server is running OpenApi documentation can be found at `http://localhost:8080/api`.
 
-![API Doc image](https://github.com/mazeduldev/markopolo-ai-full-stack-challenge/blob/main/API_DOC.png?raw=true)
+![API Doc image](https://github.com/mazeduldev/markopolo-ai-full-stack-challenge/blob/main/docs/API_DOC.png?raw=true)
 
 ## License
 
