@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { createZodDto } from 'nestjs-zod';
 import { createStoreDtoZodSchema } from 'src/store/dto/create-store.dto';
 import { z } from 'zod';
 
@@ -31,12 +32,13 @@ export const authTokensZodSchema = z.object({
 
 export type AuthTokens = z.infer<typeof authTokensZodSchema>;
 
-export const userMinimalZodSchema = z.object({
+export const UserMinimalZodSchema = z.object({
   id: z.string().uuid().describe('Authenticated user ID'),
   email: z.string().email().describe('Authenticated user email'),
   name: z.string().describe('Authenticated user full name'),
 });
-export type UserMinimal = z.infer<typeof userMinimalZodSchema>;
+export type UserMinimal = z.infer<typeof UserMinimalZodSchema>;
+export class UserDto extends createZodDto(UserMinimalZodSchema) {}
 
 export type AuthenticatedRequest = Request & { user: UserMinimal };
 

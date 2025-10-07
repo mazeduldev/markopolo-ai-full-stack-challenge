@@ -2,7 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { AuthService } from '../auth.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { userMinimalZodSchema } from '../dto/auth.dto';
+import { UserMinimalZodSchema } from '../dto/auth.dto';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
@@ -21,6 +21,6 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     if (!user) {
       throw new UnauthorizedException();
     }
-    return userMinimalZodSchema.parse(user);
+    return UserMinimalZodSchema.parse(user);
   }
 }

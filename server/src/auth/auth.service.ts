@@ -8,7 +8,7 @@ import {
   LoginResponse,
   RegisterUserDto,
   UserMinimal,
-  userMinimalZodSchema,
+  UserMinimalZodSchema,
 } from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
@@ -46,12 +46,12 @@ export class AuthService {
       user.secret.password_hash,
     );
 
-    return isPasswordValid ? userMinimalZodSchema.parse(user) : null;
+    return isPasswordValid ? UserMinimalZodSchema.parse(user) : null;
   }
 
   async login(user: UserMinimal): Promise<LoginResponse> {
     const tokens = await this.generateTokens(user);
-    return { ...tokens, user: userMinimalZodSchema.parse(user) };
+    return { ...tokens, user: UserMinimalZodSchema.parse(user) };
   }
 
   async register(registerUserDto: RegisterUserDto) {
