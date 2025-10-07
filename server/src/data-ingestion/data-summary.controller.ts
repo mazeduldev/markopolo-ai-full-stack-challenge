@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   NotFoundException,
-  Param,
   Req,
   UseGuards,
 } from '@nestjs/common';

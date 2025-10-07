@@ -12,15 +12,12 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
-  UseInterceptors,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateStoreDto, StoreDto, UpdateStoreDto } from './dto/store.dto';
-import { ZodPipe } from 'src/pipes/zod.pipe';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
-import { ZodResponse, ZodSerializerInterceptor } from 'nestjs-zod';
-import z from 'zod';
+import { ZodResponse } from 'nestjs-zod';
 
 @Controller('store')
 @UseGuards(AccessTokenGuard)

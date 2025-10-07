@@ -1,12 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import {
-  Agent,
-  AgentOutputType,
-  assistant,
-  handoff,
-  run,
-  tool,
-} from '@openai/agents';
+import { Agent, AgentOutputType, handoff, run, tool } from '@openai/agents';
 import {
   CreateCampaignDto,
   CreateCampaignZodSchema,
