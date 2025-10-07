@@ -11,6 +11,8 @@ import { CampaignModule } from './campaign/campaign.module';
 import { DataIngestionModule } from './data-ingestion/data-ingestion.module';
 import { StoreModule } from './store/store.module';
 import { AiMockDataGeneratorModule } from './ai-mock-data-generator/ai-mock-data-generator.module';
+import { APP_PIPE, APP_INTERCEPTOR } from '@nestjs/core';
+import { ZodValidationPipe, ZodSerializerInterceptor } from 'nestjs-zod';
 
 @Module({
   imports: [
@@ -32,5 +34,15 @@ import { AiMockDataGeneratorModule } from './ai-mock-data-generator/ai-mock-data
     AiMockDataGeneratorModule,
   ],
   controllers: [AppController],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ZodSerializerInterceptor,
+    },
+  ],
 })
 export class AppModule {}
