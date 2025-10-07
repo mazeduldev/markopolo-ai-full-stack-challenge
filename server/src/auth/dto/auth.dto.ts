@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { createZodDto } from 'nestjs-zod';
-import { createStoreDtoZodSchema } from 'src/store/dto/create-store.dto';
+import { CreateStoreSchema } from 'src/store/dto/store.dto';
 import { z } from 'zod';
 
 // register user request should use this schema
@@ -8,7 +8,7 @@ export const registerUserZodSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(4, 'Password must be at least 4 characters'),
   name: z.string().min(1, 'Name is required'),
-  store: createStoreDtoZodSchema,
+  store: CreateStoreSchema,
 });
 export type RegisterUserDto = z.infer<typeof registerUserZodSchema>;
 

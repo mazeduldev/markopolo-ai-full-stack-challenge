@@ -2,18 +2,15 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateStoreDto } from './dto/create-store.dto';
+import { CreateStoreType, UpdateStoreDto } from './dto/store.dto';
 import { Repository } from 'typeorm';
 import { Store } from './entities/store.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from 'src/user/user.service';
 import { DataSummaryService } from 'src/data-ingestion/data-summary.service';
-import { CreateGoogleAdsSummaryZodSchema } from 'src/data-ingestion/dto/google-ads-summary.dto';
-import { CreateShopifySummaryZodSchema } from 'src/data-ingestion/dto/shopify-summary.dto';
-import { CreateWebsiteAnalyticsSummaryZodSchema } from 'src/data-ingestion/dto/website-analytics-summary.dto';
-import { UpdateStoreDto } from './dto/update-store.dto';
 import { DataSourceConnectionService } from 'src/data-ingestion/data-source-connection.service';
 import {
   ConnectionStatus,
@@ -22,6 +19,8 @@ import {
 
 @Injectable()
 export class StoreService {
+  private readonly logger = new Logger(StoreService.name);
+
   constructor(
     @InjectRepository(Store)
     private readonly storeRepository: Repository<Store>,
@@ -31,7 +30,7 @@ export class StoreService {
     private readonly dataSourceConnectionService: DataSourceConnectionService,
   ) {}
 
-  async createAndSave(createStoreDto: CreateStoreDto, userId: string) {
+  async createAndSave(createStoreDto: CreateStoreType, userId: string) {
     const isExists = await this.storeRepository.exists({
       where: { user_id: userId },
     });
@@ -56,13 +55,15 @@ export class StoreService {
     return newStore;
   }
 
-  updateByUserId(userId: string, updateStoreDto: UpdateStoreDto) {
-    return this.storeRepository.update(
-      {
-        user_id: userId,
-      },
-      updateStoreDto,
-    );
+  async updateByUserId(userId: string, updateStoreDto: UpdateStoreDto) {
+    const updatedStore = await this.storeRepository
+      .createQueryBuilder()
+      .update(Store)
+      .set(updateStoreDto)
+      .where('user_id = :userId', { userId })
+      .returning('*')
+      .execute();
+    return updatedStore;
   }
 
   getStoreByUserId(userId: string) {

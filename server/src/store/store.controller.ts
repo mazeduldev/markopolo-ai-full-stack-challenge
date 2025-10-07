@@ -4,9 +4,7 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
-  UsePipes,
   UseGuards,
   Req,
   NotFoundException,
@@ -14,19 +12,15 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  UseInterceptors,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
-import {
-  createStoreDtoZodSchema,
-  type CreateStoreDto,
-} from './dto/create-store.dto';
+import { CreateStoreDto, StoreDto, UpdateStoreDto } from './dto/store.dto';
 import { ZodPipe } from 'src/pipes/zod.pipe';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
-import {
-  type UpdateStoreDto,
-  updateStoreDtoZodSchema,
-} from './dto/update-store.dto';
+import { ZodResponse, ZodSerializerInterceptor } from 'nestjs-zod';
+import z from 'zod';
 
 @Controller('store')
 @UseGuards(AccessTokenGuard)
@@ -36,7 +30,7 @@ export class StoreController {
   constructor(private readonly storeService: StoreService) {}
 
   @Post()
-  @UsePipes(new ZodPipe(createStoreDtoZodSchema))
+  @ZodResponse({ type: StoreDto, status: HttpStatus.CREATED })
   async create(
     @Req() req: AuthenticatedRequest,
     @Body() createStoreDto: CreateStoreDto,
@@ -55,6 +49,7 @@ export class StoreController {
   }
 
   @Get()
+  @ZodResponse({ type: StoreDto, status: HttpStatus.OK })
   async getStoreByUser(@Req() req: AuthenticatedRequest) {
     const store = await this.storeService.getStoreByUserId(req.user.id);
     if (!store) {
@@ -63,6 +58,7 @@ export class StoreController {
     return store;
   }
 
+  // todo: define the response schema
   @Get('campaign-creation-data')
   async getStoreDataForCampaignCreation(@Req() req: AuthenticatedRequest) {
     return this.storeService.getStoreDataForCampaignCreation(req.user.id);
@@ -75,7 +71,7 @@ export class StoreController {
   }
 
   @Patch()
-  @UsePipes(new ZodPipe(updateStoreDtoZodSchema))
+  @ZodResponse({ type: StoreDto, status: HttpStatus.OK })
   async updateStoreByUser(
     @Req() req: AuthenticatedRequest,
     @Body() updateStoreDto: UpdateStoreDto,
@@ -90,6 +86,6 @@ export class StoreController {
     if (updateResult.affected > 1) {
       this.logger.warn('Multiple stores updated for User ID: ' + req.user.id);
     }
-    return updateResult.affected;
+    return updateResult.raw[0];
   }
 }
