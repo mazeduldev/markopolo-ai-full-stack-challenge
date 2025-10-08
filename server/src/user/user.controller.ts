@@ -7,7 +7,7 @@ import { ZodResponse } from 'nestjs-zod';
 @UseGuards(AccessTokenGuard)
 export class UserController {
   @Get('me')
-  @ZodResponse({ type: UserDto })
+  @ZodResponse({ type: UserDto, status: 200 })
   getCurrentUser(@Req() req: AuthenticatedRequest) {
     return req.user;
   }

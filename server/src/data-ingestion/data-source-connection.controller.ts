@@ -2,32 +2,34 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
+  Logger,
   Param,
   Patch,
   Post,
   Req,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
 import { DataSourceConnectionService } from './data-source-connection.service';
 import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import {
-  DataSourceConnectionViewType,
-  dataSourceConnectionZodSchema,
-  type CreateDataSourceConnectionDto,
+  DataSourceConnectionViewDto,
+  CreateDataSourceConnectionDto,
+  DataSourceConnectionDto,
 } from './dto/data-source-connection.dto';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
-import { ZodPipe } from 'src/pipes/zod.pipe';
+import { ZodResponse } from 'nestjs-zod';
 
 @UseGuards(AccessTokenGuard)
 @Controller('data-source-connection')
 export class DataSourceConnectionController {
+  private readonly logger = new Logger(DataSourceConnectionController.name);
   constructor(
     private readonly dataSourceService: DataSourceConnectionService,
   ) {}
 
   @Post()
-  @UsePipes(new ZodPipe(dataSourceConnectionZodSchema))
+  @ZodResponse({ type: DataSourceConnectionDto, status: HttpStatus.CREATED })
   createConnection(
     @Req() request: AuthenticatedRequest,
     @Body() createConnectionDto: CreateDataSourceConnectionDto,
@@ -39,9 +41,10 @@ export class DataSourceConnectionController {
   }
 
   @Patch(':id/toggle-connection')
+  @ZodResponse({ type: DataSourceConnectionDto, status: HttpStatus.OK })
   toggleConnection(
-    @Req() request: AuthenticatedRequest,
     @Param('id') connectionId: string,
+    @Req() request: AuthenticatedRequest,
   ) {
     return this.dataSourceService.toggleConnection(
       connectionId,
@@ -50,9 +53,8 @@ export class DataSourceConnectionController {
   }
 
   @Get()
-  getConnections(
-    @Req() request: AuthenticatedRequest,
-  ): Promise<DataSourceConnectionViewType[]> {
+  @ZodResponse({ type: [DataSourceConnectionViewDto], status: HttpStatus.OK })
+  getConnections(@Req() request: AuthenticatedRequest) {
     return this.dataSourceService.getConnections(request.user.id);
   }
 }

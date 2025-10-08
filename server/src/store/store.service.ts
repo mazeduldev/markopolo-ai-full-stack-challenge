@@ -13,8 +13,8 @@ import { UserService } from 'src/user/user.service';
 import { DataSummaryService } from 'src/data-ingestion/data-summary.service';
 import { DataSourceConnectionService } from 'src/data-ingestion/data-source-connection.service';
 import {
-  ConnectionStatus,
-  DataSourceType,
+  EConnectionStatus,
+  EDataSourceType,
 } from 'src/data-ingestion/dto/data-source-connection.dto';
 
 @Injectable()
@@ -87,7 +87,7 @@ export class StoreService {
 
     const connections = (
       await this.dataSourceConnectionService.getConnections(userId)
-    ).filter((c) => c.status === ConnectionStatus.CONNECTED);
+    ).filter((c) => c.status === EConnectionStatus.CONNECTED);
 
     if (connections.length === 0) {
       throw new NotFoundException('No data source connections found for user');
@@ -95,15 +95,15 @@ export class StoreService {
 
     const promises = connections.map((connection) => {
       switch (connection.type) {
-        case DataSourceType.GOOGLE_ADS:
+        case EDataSourceType.GOOGLE_ADS:
           return this.dataSummaryService.getLatestGoogleAdsSummaryByUserId(
             userId,
           );
-        case DataSourceType.SHOPIFY:
+        case EDataSourceType.SHOPIFY:
           return this.dataSummaryService.getLatestShopifySummaryByUserId(
             userId,
           );
-        case DataSourceType.WEBSITE_ANALYTICS:
+        case EDataSourceType.WEBSITE_ANALYTICS:
           return this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByUserId(
             userId,
           );

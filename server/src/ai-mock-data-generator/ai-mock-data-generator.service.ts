@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
-import { DataSourceType } from 'src/data-ingestion/dto/data-source-connection.dto';
+import { EDataSourceType } from 'src/data-ingestion/dto/data-source-connection.dto';
 import {
   CreateGoogleAdsSummaryDto,
   CreateGoogleAdsSummaryZodSchema,
@@ -30,18 +30,18 @@ export class AiMockDataGeneratorService implements OnModuleInit {
 
   async generateMockData(
     store: { name: string; url: string },
-    provider: DataSourceType,
+    provider: EDataSourceType,
   ) {
     this.logger.log(
       `Generating mock data for store ${store.name} with provider ${provider}`,
     );
 
     switch (provider) {
-      case DataSourceType.GOOGLE_ADS:
+      case EDataSourceType.GOOGLE_ADS:
         return this.generateMockDataForGoogleAds(store);
-      case DataSourceType.SHOPIFY:
+      case EDataSourceType.SHOPIFY:
         return this.generateMockDataForShopify(store);
-      case DataSourceType.WEBSITE_ANALYTICS:
+      case EDataSourceType.WEBSITE_ANALYTICS:
         return this.generateMockDataForWebsiteAnalytics(store);
       default:
         throw new Error(`Unsupported provider`);

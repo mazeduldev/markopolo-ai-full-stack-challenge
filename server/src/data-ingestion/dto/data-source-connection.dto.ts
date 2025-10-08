@@ -1,24 +1,27 @@
+import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
-export enum DataSourceType {
+// Enum
+export enum EDataSourceType {
   SHOPIFY = 'shopify',
   GOOGLE_ADS = 'google_ads',
   WEBSITE_ANALYTICS = 'website_analytics',
 }
 
-export enum ConnectionStatus {
+export enum EConnectionStatus {
   CONNECTED = 'connected',
   DISCONNECTED = 'disconnected',
   ERROR = 'error',
   PENDING = 'pending',
 }
 
-export const dataSourceTypeZodSchema = z.nativeEnum(DataSourceType);
-export const connectionStatusZodSchema = z.nativeEnum(ConnectionStatus);
+// Schema
+export const DataSourceTypeSchema = z.nativeEnum(EDataSourceType);
+export const ConnectionStatusSchema = z.nativeEnum(EConnectionStatus);
 
-export const dataSourceConnectionZodSchema = z.object({
-  status: connectionStatusZodSchema.default(ConnectionStatus.CONNECTED),
-  type: dataSourceTypeZodSchema,
+export const CreateDataSourceConnectionSchema = z.object({
+  type: DataSourceTypeSchema,
+  status: ConnectionStatusSchema.default(EConnectionStatus.CONNECTED),
 
   credentials: z
     .object({
@@ -38,21 +41,53 @@ export const dataSourceConnectionZodSchema = z.object({
     .optional(),
 });
 
-export const dataSourceConnectionViewZodSchema = z.object({
+export const UpdateDataSourceConnectionSchema =
+  CreateDataSourceConnectionSchema.partial();
+
+export const DataSourceConnectionSchema =
+  CreateDataSourceConnectionSchema.extend({
+    id: z.string().uuid(),
+    user_id: z.string().uuid(),
+    last_synced_at: z.date().nullable(),
+    error_message: z.string().nullable(),
+    created_at: z.date(),
+    updated_at: z.date(),
+  });
+
+export const DataSourceConnectionViewSchema = z.object({
   id: z.string().uuid(),
-  type: dataSourceTypeZodSchema,
-  status: connectionStatusZodSchema,
+  type: DataSourceTypeSchema,
+  status: ConnectionStatusSchema,
 });
-export type DataSourceConnectionViewType = z.infer<
-  typeof dataSourceConnectionViewZodSchema
+
+// Type
+export type CreateDataSourceConnection = z.infer<
+  typeof CreateDataSourceConnectionSchema
 >;
 
-export type DataSourceConnectionType = z.infer<
-  typeof dataSourceConnectionZodSchema
+export type UpdateDataSourceConnection = z.infer<
+  typeof UpdateDataSourceConnectionSchema
 >;
 
-export type CreateDataSourceConnectionDto = z.infer<
-  typeof dataSourceConnectionZodSchema
+export type DataSourceConnection = z.infer<typeof DataSourceConnectionSchema>;
+
+export type DataSourceConnectionView = z.infer<
+  typeof DataSourceConnectionViewSchema
 >;
-export type UpdateDataSourceConnectionDto =
-  Partial<CreateDataSourceConnectionDto>;
+
+// Dto
+export class CreateDataSourceConnectionDto extends createZodDto(
+  CreateDataSourceConnectionSchema,
+) {}
+
+export class UpdateDataSourceConnectionDto extends createZodDto(
+  UpdateDataSourceConnectionSchema,
+) {}
+
+export class DataSourceConnectionDto extends createZodDto(
+  DataSourceConnectionSchema,
+) {}
+
+export class DataSourceConnectionViewDto extends createZodDto(
+  DataSourceConnectionViewSchema,
+) {}

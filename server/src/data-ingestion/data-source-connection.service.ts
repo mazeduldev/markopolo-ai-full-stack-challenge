@@ -10,11 +10,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSourceConnection } from './entities/data-source-connection.entity';
 import { Repository } from 'typeorm';
 import {
-  ConnectionStatus,
+  EConnectionStatus,
   CreateDataSourceConnectionDto,
-  DataSourceConnectionViewType,
-  dataSourceConnectionViewZodSchema,
-  DataSourceType,
+  DataSourceConnectionView,
+  DataSourceConnectionViewSchema,
+  EDataSourceType,
 } from './dto/data-source-connection.dto';
 import { StoreService } from 'src/store/store.service';
 import { ShopifySummary } from './entities/shopify-summary.entity';
@@ -102,7 +102,7 @@ export class DataSourceConnectionService {
   }
 
   private async saveDataSummary(
-    type: DataSourceType,
+    type: EDataSourceType,
     dataSummary:
       | CreateGoogleAdsSummaryDto
       | CreateShopifySummaryDto
@@ -114,7 +114,7 @@ export class DataSourceConnectionService {
     );
 
     switch (type) {
-      case DataSourceType.SHOPIFY: {
+      case EDataSourceType.SHOPIFY: {
         const shopifyData = CreateShopifySummaryZodSchema.parse(dataSummary);
         const shopifySummary = this.shopifySummaryRepository.create({
           ...shopifyData,
@@ -126,7 +126,7 @@ export class DataSourceConnectionService {
         await this.shopifySummaryRepository.save(shopifySummary);
         break;
       }
-      case DataSourceType.GOOGLE_ADS: {
+      case EDataSourceType.GOOGLE_ADS: {
         const googleAdsData =
           CreateGoogleAdsSummaryZodSchema.parse(dataSummary);
         const googleAdsSummary = this.googleAdsSummaryRepository.create({
@@ -139,7 +139,7 @@ export class DataSourceConnectionService {
         await this.googleAdsSummaryRepository.save(googleAdsSummary);
         break;
       }
-      case DataSourceType.WEBSITE_ANALYTICS: {
+      case EDataSourceType.WEBSITE_ANALYTICS: {
         const websiteAnalyticsData =
           CreateWebsiteAnalyticsSummaryZodSchema.parse(dataSummary);
         const websiteAnalyticsSummary =
@@ -170,29 +170,27 @@ export class DataSourceConnectionService {
     }
 
     connection.status =
-      connection.status === ConnectionStatus.CONNECTED
-        ? ConnectionStatus.DISCONNECTED
-        : ConnectionStatus.CONNECTED;
+      connection.status === EConnectionStatus.CONNECTED
+        ? EConnectionStatus.DISCONNECTED
+        : EConnectionStatus.CONNECTED;
 
     return this.dataSourceConnectionRepository.save(connection);
   }
 
-  async getConnections(
-    userId: string,
-  ): Promise<DataSourceConnectionViewType[]> {
+  async getConnections(userId: string): Promise<DataSourceConnectionView[]> {
     const connections = await this.dataSourceConnectionRepository.find({
       where: { user_id: userId },
     });
 
     return connections.map((connection) =>
-      dataSourceConnectionViewZodSchema.parse(connection),
+      DataSourceConnectionViewSchema.parse(connection),
     );
   }
 
   async getConnectionByTypeAndUserId(
-    type: DataSourceType,
+    type: EDataSourceType,
     userId: string,
-  ): Promise<DataSourceConnectionViewType | null> {
+  ): Promise<DataSourceConnectionView | null> {
     const connection = await this.dataSourceConnectionRepository.findOne({
       where: { type, user_id: userId },
     });
@@ -201,6 +199,6 @@ export class DataSourceConnectionService {
       return null;
     }
 
-    return dataSourceConnectionViewZodSchema.parse(connection);
+    return DataSourceConnectionViewSchema.parse(connection);
   }
 }

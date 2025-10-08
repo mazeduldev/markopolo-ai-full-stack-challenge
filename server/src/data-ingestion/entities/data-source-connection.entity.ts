@@ -9,8 +9,8 @@ import {
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import {
-  ConnectionStatus,
-  DataSourceType,
+  EConnectionStatus,
+  EDataSourceType,
 } from '../dto/data-source-connection.dto';
 
 @Entity('data_source_connections')
@@ -20,16 +20,16 @@ export class DataSourceConnection {
 
   @Column({
     type: 'enum',
-    enum: DataSourceType,
+    enum: EDataSourceType,
   })
-  type: DataSourceType;
+  type: EDataSourceType;
 
   @Column({
     type: 'enum',
-    enum: ConnectionStatus,
-    default: ConnectionStatus.CONNECTED,
+    enum: EConnectionStatus,
+    default: EConnectionStatus.CONNECTED,
   })
-  status: ConnectionStatus;
+  status: EConnectionStatus;
 
   @Column({ type: 'jsonb', nullable: true })
   credentials: {

@@ -10,8 +10,8 @@ import { DataSummaryService } from './data-summary.service';
 import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import { DataSourceConnectionService } from './data-source-connection.service';
 import {
-  ConnectionStatus,
-  DataSourceType,
+  EConnectionStatus,
+  EDataSourceType,
 } from './dto/data-source-connection.dto';
 
 @UseGuards(AccessTokenGuard)
@@ -27,7 +27,7 @@ export class DataSummaryController {
     const userId = req.user.id;
     const connection =
       await this.dataSourceConnectionService.getConnectionByTypeAndUserId(
-        DataSourceType.GOOGLE_ADS,
+        EDataSourceType.GOOGLE_ADS,
         userId,
       );
 
@@ -52,7 +52,7 @@ export class DataSummaryController {
     const userId = req.user.id;
     const connection =
       await this.dataSourceConnectionService.getConnectionByTypeAndUserId(
-        DataSourceType.SHOPIFY,
+        EDataSourceType.SHOPIFY,
         userId,
       );
 
@@ -77,7 +77,7 @@ export class DataSummaryController {
     const userId = req.user.id;
     const connection =
       await this.dataSourceConnectionService.getConnectionByTypeAndUserId(
-        DataSourceType.WEBSITE_ANALYTICS,
+        EDataSourceType.WEBSITE_ANALYTICS,
         userId,
       );
 
@@ -107,7 +107,7 @@ export class DataSummaryController {
 
     const connections = (
       await this.dataSourceConnectionService.getConnections(userId)
-    ).filter((c) => c.status === ConnectionStatus.CONNECTED);
+    ).filter((c) => c.status === EConnectionStatus.CONNECTED);
 
     if (connections.length === 0) {
       throw new NotFoundException('No data source connections found for user');
@@ -115,15 +115,15 @@ export class DataSummaryController {
 
     const promises = connections.map((connection) => {
       switch (connection.type) {
-        case DataSourceType.GOOGLE_ADS:
+        case EDataSourceType.GOOGLE_ADS:
           return this.dataSummaryService.getLatestGoogleAdsSummaryByUserId(
             userId,
           );
-        case DataSourceType.SHOPIFY:
+        case EDataSourceType.SHOPIFY:
           return this.dataSummaryService.getLatestShopifySummaryByUserId(
             userId,
           );
-        case DataSourceType.WEBSITE_ANALYTICS:
+        case EDataSourceType.WEBSITE_ANALYTICS:
           return this.dataSummaryService.getLatestWebsiteAnalyticsSummaryByUserId(
             userId,
           );
