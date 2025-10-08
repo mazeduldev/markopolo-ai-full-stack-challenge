@@ -16,7 +16,7 @@ import { ZodPipe } from 'src/pipes/zod.pipe';
 import { type MessageDto, messageZodSchema } from './dto/chat.types';
 import { ChatService } from './chat.service';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
-import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
+import type { TAuthenticatedRequest } from 'src/auth/dto/auth.dto';
 
 @Controller('chat')
 @UseGuards(AccessTokenGuard)
@@ -29,7 +29,7 @@ export class ChatController {
   @UsePipes(new ZodPipe(messageZodSchema))
   async generateCampaign(
     @Body() body: MessageDto,
-    @Req() req: AuthenticatedRequest,
+    @Req() req: TAuthenticatedRequest,
   ): Promise<{ threadId: string; content: CreateCampaignDto | string }> {
     const campaign = await this.chatService.generateCampaign(
       body.content,
@@ -44,7 +44,7 @@ export class ChatController {
   @UsePipes(new ZodPipe(messageZodSchema))
   generateCampaignStream(
     @Body() body: MessageDto,
-    @Req() req: AuthenticatedRequest,
+    @Req() req: TAuthenticatedRequest,
   ): Observable<MessageEvent> {
     return this.chatService
       .generateCampaignStream(body.content, body.thread_id, req.user.id)
@@ -64,14 +64,14 @@ export class ChatController {
 
   // todo: add pagination in real world implementation
   @Get('threads')
-  getChatThreadsByUser(@Req() req: AuthenticatedRequest) {
+  getChatThreadsByUser(@Req() req: TAuthenticatedRequest) {
     return this.chatService.getChatThreads(req.user.id);
   }
 
   @Get('/threads/:threadId')
   getChatThreadById(
     @Param('threadId') threadId: string,
-    @Req() req: AuthenticatedRequest,
+    @Req() req: TAuthenticatedRequest,
   ) {
     return this.chatService.getChatThreadById(threadId, req.user.id);
   }

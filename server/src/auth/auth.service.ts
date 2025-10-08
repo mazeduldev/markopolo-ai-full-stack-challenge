@@ -3,12 +3,12 @@ import ms from 'ms';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import {
-  AuthTokens,
-  JwtPayload,
-  LoginResponse,
-  RegisterUserDto,
-  UserMinimal,
+  TAuthTokens,
+  TJwtPayload,
+  TLoginResponse,
+  TUserMinimal,
   UserMinimalZodSchema,
+  TRegisterUser,
 } from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
@@ -49,12 +49,12 @@ export class AuthService {
     return isPasswordValid ? UserMinimalZodSchema.parse(user) : null;
   }
 
-  async login(user: UserMinimal): Promise<LoginResponse> {
+  async login(user: TUserMinimal): Promise<TLoginResponse> {
     const tokens = await this.generateTokens(user);
     return { ...tokens, user: UserMinimalZodSchema.parse(user) };
   }
 
-  async register(registerUserDto: RegisterUserDto) {
+  async register(registerUserDto: TRegisterUser) {
     const existingUser = await this.userService.findOne({
       where: { email: registerUserDto.email },
     });
@@ -83,7 +83,7 @@ export class AuthService {
     return this.login(newUser);
   }
 
-  private async generateTokens(user: UserMinimal): Promise<AuthTokens> {
+  private async generateTokens(user: TUserMinimal): Promise<TAuthTokens> {
     const accessToken = await this.generateAccessToken(user);
     // const refreshToken = await this.generateRefreshToken(user);
     const expiresIn = this.configService.get('JWT_EXPIRATION_TIME');
@@ -108,8 +108,8 @@ export class AuthService {
     throw new Error(`Invalid expiresIn type: ${typeof expiresIn}`);
   }
 
-  private async generateAccessToken(user: UserMinimal): Promise<string> {
-    const payload: JwtPayload = {
+  private async generateAccessToken(user: TUserMinimal): Promise<string> {
+    const payload: TJwtPayload = {
       sub: user.id,
       email: user.email,
       name: user.name,

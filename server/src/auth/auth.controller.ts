@@ -1,38 +1,36 @@
 import {
   Body,
   Controller,
-  HttpCode,
   HttpStatus,
   Post,
   Req,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
-  registerUserZodSchema,
-  type AuthenticatedRequest,
-  type AuthTokens,
-  type RegisterUserDto,
+  RegisterUserResponseDto,
+  RegisterUserDto,
+  LoginUserDto,
+  type TAuthenticatedRequest,
+  LoginUserResponseDto,
 } from './dto/auth.dto';
 import { LocalAuthGuard } from './passport/local-auth.guard';
-import { ZodPipe } from 'src/pipes/zod.pipe';
+import { ZodResponse } from 'nestjs-zod';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  @HttpCode(HttpStatus.CREATED)
-  @UsePipes(new ZodPipe(registerUserZodSchema))
-  register(@Body() registerUserDto: RegisterUserDto): Promise<AuthTokens> {
+  @ZodResponse({ type: RegisterUserResponseDto, status: HttpStatus.CREATED })
+  register(@Body() registerUserDto: RegisterUserDto) {
     return this.authService.register(registerUserDto);
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  @HttpCode(HttpStatus.OK)
-  login(@Req() req: AuthenticatedRequest): Promise<AuthTokens> {
+  @ZodResponse({ type: LoginUserResponseDto, status: HttpStatus.OK })
+  login(@Req() req: TAuthenticatedRequest, @Body() loginUserDto: LoginUserDto) {
     return this.authService.login(req.user);
   }
 }

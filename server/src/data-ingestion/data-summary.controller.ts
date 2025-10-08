@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import { DataSummaryService } from './data-summary.service';
-import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
+import type { TAuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import { DataSourceConnectionService } from './data-source-connection.service';
 import {
   EConnectionStatus,
@@ -30,7 +30,7 @@ export class DataSummaryController {
 
   @Get('google-ads')
   @ZodResponse({ type: GoogleAdsSummaryDto, status: HttpStatus.OK })
-  async getLatestGoogleAdsSummaryByStore(@Req() req: AuthenticatedRequest) {
+  async getLatestGoogleAdsSummaryByStore(@Req() req: TAuthenticatedRequest) {
     const userId = req.user.id;
     const connection =
       await this.dataSourceConnectionService.getConnectionByTypeAndUserId(
@@ -56,7 +56,7 @@ export class DataSummaryController {
 
   @Get('shopify')
   @ZodResponse({ type: ShopifySummaryDto, status: HttpStatus.OK })
-  async getLatestShopifySummaryByStore(@Req() req: AuthenticatedRequest) {
+  async getLatestShopifySummaryByStore(@Req() req: TAuthenticatedRequest) {
     const userId = req.user.id;
     const connection =
       await this.dataSourceConnectionService.getConnectionByTypeAndUserId(
@@ -81,7 +81,7 @@ export class DataSummaryController {
   @Get('website-analytics')
   @ZodResponse({ type: WebsiteAnalyticsSummaryDto, status: HttpStatus.OK })
   async getLatestWebsiteAnalyticsSummaryByStore(
-    @Req() req: AuthenticatedRequest,
+    @Req() req: TAuthenticatedRequest,
   ) {
     const userId = req.user.id;
     const connection =
@@ -112,7 +112,7 @@ export class DataSummaryController {
 
   @Get()
   @ZodResponse({ type: CombinedSummaryDto, status: HttpStatus.OK })
-  async getAvailableDataSummaryForStore(@Req() req: AuthenticatedRequest) {
+  async getAvailableDataSummaryForStore(@Req() req: TAuthenticatedRequest) {
     const userId = req.user.id;
 
     const connections = (

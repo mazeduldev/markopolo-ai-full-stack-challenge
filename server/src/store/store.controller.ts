@@ -16,7 +16,7 @@ import {
 import { StoreService } from './store.service';
 import { CreateStoreDto, StoreDto, UpdateStoreDto } from './dto/store.dto';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
-import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
+import type { TAuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import { ZodResponse } from 'nestjs-zod';
 
 @Controller('store')
@@ -29,7 +29,7 @@ export class StoreController {
   @Post()
   @ZodResponse({ type: StoreDto, status: HttpStatus.CREATED })
   async create(
-    @Req() req: AuthenticatedRequest,
+    @Req() req: TAuthenticatedRequest,
     @Body() createStoreDto: CreateStoreDto,
   ) {
     try {
@@ -47,7 +47,7 @@ export class StoreController {
 
   @Get()
   @ZodResponse({ type: StoreDto, status: HttpStatus.OK })
-  async getStoreByUser(@Req() req: AuthenticatedRequest) {
+  async getStoreByUser(@Req() req: TAuthenticatedRequest) {
     const store = await this.storeService.getStoreByUserId(req.user.id);
     if (!store) {
       throw new NotFoundException('Store not found for this user');
@@ -57,20 +57,20 @@ export class StoreController {
 
   // todo: define the response schema
   @Get('campaign-creation-data')
-  async getStoreDataForCampaignCreation(@Req() req: AuthenticatedRequest) {
+  async getStoreDataForCampaignCreation(@Req() req: TAuthenticatedRequest) {
     return this.storeService.getStoreDataForCampaignCreation(req.user.id);
   }
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async removeStoreByUser(@Req() req: AuthenticatedRequest) {
+  async removeStoreByUser(@Req() req: TAuthenticatedRequest) {
     await this.storeService.removeByUserId(req.user.id);
   }
 
   @Patch()
   @ZodResponse({ type: StoreDto, status: HttpStatus.OK })
   async updateStoreByUser(
-    @Req() req: AuthenticatedRequest,
+    @Req() req: TAuthenticatedRequest,
     @Body() updateStoreDto: UpdateStoreDto,
   ) {
     const updateResult = await this.storeService.updateByUserId(

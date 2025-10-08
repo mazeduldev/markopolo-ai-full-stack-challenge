@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto } from 'src/auth/dto/auth.dto';
+import type { TCreateUser } from 'src/auth/dto/auth.dto';
 import { FindOneOptions, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
@@ -14,7 +14,7 @@ export class UserService {
     return this.userRepository.findOne(options);
   }
 
-  create(registerUserDto: CreateUserDto) {
+  create(registerUserDto: TCreateUser) {
     return this.userRepository.create(registerUserDto);
   }
 

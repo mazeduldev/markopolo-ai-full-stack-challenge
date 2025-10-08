@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { DataSourceConnectionService } from './data-source-connection.service';
-import type { AuthenticatedRequest } from 'src/auth/dto/auth.dto';
+import type { TAuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import {
   DataSourceConnectionViewDto,
   CreateDataSourceConnectionDto,
@@ -31,7 +31,7 @@ export class DataSourceConnectionController {
   @Post()
   @ZodResponse({ type: DataSourceConnectionDto, status: HttpStatus.CREATED })
   createConnection(
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TAuthenticatedRequest,
     @Body() createConnectionDto: CreateDataSourceConnectionDto,
   ) {
     return this.dataSourceService.createConnection(
@@ -44,7 +44,7 @@ export class DataSourceConnectionController {
   @ZodResponse({ type: DataSourceConnectionDto, status: HttpStatus.OK })
   toggleConnection(
     @Param('id') connectionId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TAuthenticatedRequest,
   ) {
     return this.dataSourceService.toggleConnection(
       connectionId,
@@ -54,7 +54,7 @@ export class DataSourceConnectionController {
 
   @Get()
   @ZodResponse({ type: [DataSourceConnectionViewDto], status: HttpStatus.OK })
-  getConnections(@Req() request: AuthenticatedRequest) {
+  getConnections(@Req() request: TAuthenticatedRequest) {
     return this.dataSourceService.getConnections(request.user.id);
   }
 }
