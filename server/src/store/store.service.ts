@@ -5,7 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateStoreType, UpdateStoreDto } from './dto/store.dto';
+import { TCreateStore, UpdateStoreDto } from './dto/store.dto';
 import { Repository } from 'typeorm';
 import { Store } from './entities/store.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -30,7 +30,7 @@ export class StoreService {
     private readonly dataSourceConnectionService: DataSourceConnectionService,
   ) {}
 
-  async createAndSave(createStoreDto: CreateStoreType, userId: string) {
+  async createAndSave(createStoreDto: TCreateStore, userId: string) {
     const isExists = await this.storeRepository.exists({
       where: { user_id: userId },
     });

@@ -19,9 +19,9 @@ export const StoreSchema = CreateStoreSchema.extend({
 });
 
 // Type
-export type CreateStoreType = z.infer<typeof CreateStoreSchema>;
-export type UpdateStoreType = z.infer<typeof UpdateStoreSchema>;
-export type StoreType = z.infer<typeof StoreSchema>;
+export type TCreateStore = z.infer<typeof CreateStoreSchema>;
+export type TUpdateStore = z.infer<typeof UpdateStoreSchema>;
+export type TStore = z.infer<typeof StoreSchema>;
 
 // DTO
 export class CreateStoreDto extends createZodDto(CreateStoreSchema) {}
