@@ -38,7 +38,7 @@ export const CreateWebsiteAnalyticsSummarySchema =
   });
 
 // Type
-export type TWebsiteAnalyticsSummaryType = z.infer<
+export type TWebsiteAnalyticsSummary = z.infer<
   typeof WebsiteAnalyticsSummarySchema
 >;
 

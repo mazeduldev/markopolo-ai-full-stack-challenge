@@ -14,7 +14,12 @@ import {
   Logger,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
-import { CreateStoreDto, StoreDto, UpdateStoreDto } from './dto/store.dto';
+import {
+  CreateStoreDto,
+  StoreDataForCampaignCreationDto,
+  StoreDto,
+  UpdateStoreDto,
+} from './dto/store.dto';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import type { TAuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import { ZodResponse } from 'nestjs-zod';
@@ -55,8 +60,8 @@ export class StoreController {
     return store;
   }
 
-  // todo: define the response schema
   @Get('campaign-creation-data')
+  @ZodResponse({ type: StoreDataForCampaignCreationDto, status: HttpStatus.OK })
   async getStoreDataForCampaignCreation(@Req() req: TAuthenticatedRequest) {
     return this.storeService.getStoreDataForCampaignCreation(req.user.id);
   }

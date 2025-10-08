@@ -5,7 +5,11 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { TCreateStore, UpdateStoreDto } from './dto/store.dto';
+import {
+  TCreateStore,
+  TStoreDataForCampaignCreation,
+  UpdateStoreDto,
+} from './dto/store.dto';
 import { Repository } from 'typeorm';
 import { Store } from './entities/store.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,6 +20,7 @@ import {
   EConnectionStatus,
   EDataSourceType,
 } from 'src/data-ingestion/dto/data-source-connection.dto';
+import { TCombinedSummary } from 'src/data-ingestion/dto/combined-summary.dto';
 
 @Injectable()
 export class StoreService {
@@ -76,7 +81,9 @@ export class StoreService {
     return this.storeRepository.delete({ user_id: userId });
   }
 
-  async getStoreDataForCampaignCreation(userId: string) {
+  async getStoreDataForCampaignCreation(
+    userId: string,
+  ): Promise<TStoreDataForCampaignCreation> {
     const store = await this.storeRepository.findOne({
       where: { user_id: userId },
     });
@@ -114,15 +121,12 @@ export class StoreService {
 
     const results = await Promise.all(promises);
 
-    const processedResults = results
+    const processedResults: TCombinedSummary = results
       .filter((result) => result != null)
-      .reduce(
-        (acc, curr) => {
-          acc = { ...acc, ...curr };
-          return acc;
-        },
-        {} as Record<'google_ads' | 'shopify' | 'website_analytics', unknown>,
-      );
+      .reduce((acc, curr) => {
+        acc = { ...acc, ...curr };
+        return acc;
+      }, {});
 
     return {
       store: {

@@ -1,4 +1,5 @@
 import { createZodDto } from 'nestjs-zod';
+import { CombinedSummarySchema } from 'src/data-ingestion/dto/combined-summary.dto';
 import { z } from 'zod';
 
 // Schema
@@ -18,12 +19,22 @@ export const StoreSchema = CreateStoreSchema.extend({
   updated_at: z.date(),
 });
 
+export const StoreDataForCampaignCreationSchema = CombinedSummarySchema.extend({
+  store: CreateStoreSchema,
+});
+
 // Type
 export type TCreateStore = z.infer<typeof CreateStoreSchema>;
 export type TUpdateStore = z.infer<typeof UpdateStoreSchema>;
 export type TStore = z.infer<typeof StoreSchema>;
+export type TStoreDataForCampaignCreation = z.infer<
+  typeof StoreDataForCampaignCreationSchema
+>;
 
 // DTO
 export class CreateStoreDto extends createZodDto(CreateStoreSchema) {}
 export class UpdateStoreDto extends createZodDto(UpdateStoreSchema) {}
 export class StoreDto extends createZodDto(StoreSchema) {}
+export class StoreDataForCampaignCreationDto extends createZodDto(
+  StoreDataForCampaignCreationSchema,
+) {}

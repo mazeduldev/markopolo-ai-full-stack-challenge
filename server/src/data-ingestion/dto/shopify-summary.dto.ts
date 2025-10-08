@@ -39,7 +39,7 @@ export const CreateShopifySummarySchema = ShopifySummarySchema.omit({
 });
 
 // Type
-export type TShopifySummaryType = z.infer<typeof ShopifySummarySchema>;
+export type TShopifySummary = z.infer<typeof ShopifySummarySchema>;
 
 // Dto
 export class CreateShopifySummaryDto extends createZodDto(

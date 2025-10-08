@@ -11,5 +11,8 @@ export const CombinedSummarySchema = z.object({
   website_analytics: WebsiteAnalyticsSummarySchema.optional(),
 });
 
+// Type
+export type TCombinedSummary = z.infer<typeof CombinedSummarySchema>;
+
 // Dto
 export class CombinedSummaryDto extends createZodDto(CombinedSummarySchema) {}
