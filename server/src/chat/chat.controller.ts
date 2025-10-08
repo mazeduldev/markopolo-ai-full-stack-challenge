@@ -21,9 +21,10 @@ import { ChatService } from './chat.service';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import type { TAuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import { ZodResponse } from 'nestjs-zod';
-import { ApiProduces } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiProduces } from '@nestjs/swagger';
 
 @Controller('chat')
+@ApiBearerAuth('access-token')
 @UseGuards(AccessTokenGuard)
 export class ChatController {
   private readonly logger = new Logger(ChatController.name);

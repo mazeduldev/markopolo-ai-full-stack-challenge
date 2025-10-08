@@ -19,9 +19,11 @@ import { GoogleAdsSummaryDto } from './dto/google-ads-summary.dto';
 import { ShopifySummaryDto } from './dto/shopify-summary.dto';
 import { WebsiteAnalyticsSummaryDto } from './dto/website-analytics-summary.dto';
 import { CombinedSummaryDto } from './dto/combined-summary.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
-@UseGuards(AccessTokenGuard)
 @Controller('data-summary')
+@ApiBearerAuth('access-token')
+@UseGuards(AccessTokenGuard)
 export class DataSummaryController {
   constructor(
     private readonly dataSummaryService: DataSummaryService,

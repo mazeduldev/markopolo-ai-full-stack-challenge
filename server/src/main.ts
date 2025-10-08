@@ -15,6 +15,17 @@ async function bootstrap() {
     .setTitle('AI Marketing API')
     .setDescription('API documentation of the AI Marketing service')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Enter JWT token',
+        name: 'Authorization',
+        in: 'header',
+      },
+      'access-token', // This name ('access-token') should match the name used in @ApiBearerAuth() decorator
+    )
     .build();
   const openApiDoc = SwaggerModule.createDocument(app, docConfig);
   SwaggerModule.setup('api', app, cleanupOpenApiDoc(openApiDoc));

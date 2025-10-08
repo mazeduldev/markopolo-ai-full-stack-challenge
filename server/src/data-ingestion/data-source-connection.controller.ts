@@ -19,9 +19,11 @@ import {
 } from './dto/data-source-connection.dto';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import { ZodResponse } from 'nestjs-zod';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
-@UseGuards(AccessTokenGuard)
 @Controller('data-source-connection')
+@ApiBearerAuth('access-token')
+@UseGuards(AccessTokenGuard)
 export class DataSourceConnectionController {
   private readonly logger = new Logger(DataSourceConnectionController.name);
   constructor(

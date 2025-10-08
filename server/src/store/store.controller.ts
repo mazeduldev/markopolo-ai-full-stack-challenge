@@ -23,8 +23,10 @@ import {
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import type { TAuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import { ZodResponse } from 'nestjs-zod';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('store')
+@ApiBearerAuth('access-token')
 @UseGuards(AccessTokenGuard)
 export class StoreController {
   private readonly logger = new Logger(StoreController.name);
