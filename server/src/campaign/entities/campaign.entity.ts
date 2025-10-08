@@ -9,7 +9,7 @@ import {
   Index,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
-import { ChannelType } from '../dto/campaign.dto';
+import { EChannelType } from '../dto/campaign.dto';
 
 @Entity('campaigns')
 @Index(['user_id', 'created_at'])
@@ -35,10 +35,10 @@ export class Campaign {
 
   @Column({
     type: 'enum',
-    enum: ChannelType,
+    enum: EChannelType,
     array: true,
   })
-  channels: ChannelType[];
+  channels: EChannelType[];
 
   @Column({ type: 'jsonb' })
   timeline: {

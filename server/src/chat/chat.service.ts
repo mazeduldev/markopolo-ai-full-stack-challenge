@@ -7,8 +7,8 @@ import { Repository } from 'typeorm';
 import { CampaignService } from 'src/campaign/campaign.service';
 import { Observable, tap, map } from 'rxjs';
 import {
-  CreateCampaignDto,
-  CreateCampaignZodSchema,
+  TCreateCampaign,
+  CreateCampaignSchema,
 } from 'src/campaign/dto/campaign.dto';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class ChatService {
     prompt: string,
     threadId: string | undefined | null,
     userId: string,
-  ): Promise<{ threadId: string; content: string | CreateCampaignDto }> {
+  ): Promise<{ threadId: string; content: string | TCreateCampaign }> {
     // Create or get existing thread
     const thread = await this.getOrCreateThread(userId, threadId, prompt);
 
@@ -121,8 +121,7 @@ export class ChatService {
               complete: async () => {
                 try {
                   const parsedResponse = JSON.parse(fullResponse);
-                  const campaign =
-                    CreateCampaignZodSchema.parse(parsedResponse);
+                  const campaign = CreateCampaignSchema.parse(parsedResponse);
                   if (campaign) {
                     // It's a valid campaign object
                     const savedCampaign =

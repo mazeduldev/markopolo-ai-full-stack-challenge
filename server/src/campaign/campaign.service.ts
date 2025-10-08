@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Campaign } from './entities/campaign.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  CreateCampaignDto,
-  CreateCampaignWithUserDto,
-} from './dto/campaign.dto';
+import { TCreateCampaign, TCreateCampaignWithUser } from './dto/campaign.dto';
 
 @Injectable()
 export class CampaignService {
@@ -15,7 +12,7 @@ export class CampaignService {
   ) {}
 
   saveCampaign(
-    campaignDto: CreateCampaignDto | CreateCampaignWithUserDto,
+    campaignDto: TCreateCampaign | TCreateCampaignWithUser,
     userId?: string,
   ): Promise<Campaign> {
     const campaign = this.campaignRepository.create({

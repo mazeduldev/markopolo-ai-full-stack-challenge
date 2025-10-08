@@ -1,13 +1,16 @@
+import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
-export enum ChannelType {
+// Enum
+export enum EChannelType {
   EMAIL = 'email',
   SMS = 'sms',
   PUSH = 'push',
   WHATSAPP = 'whatsapp',
 }
 
-export const CreateCampaignZodSchema = z.object({
+// Schema
+export const CreateCampaignSchema = z.object({
   campaign_title: z.string().describe('The title of the marketing campaign'),
   target_audience: z
     .string()
@@ -29,7 +32,7 @@ export const CreateCampaignZodSchema = z.object({
     })
     .describe('The main message of the campaign'),
   channels: z
-    .array(z.nativeEnum(ChannelType))
+    .array(z.nativeEnum(EChannelType))
     .describe(
       'The marketing channels to be used for the campaign (e.g., email, sms, push, whatsapp, etc.)',
     ),
@@ -70,14 +73,21 @@ export const CreateCampaignZodSchema = z.object({
     ),
 });
 
-export const CreateCampaignWithUserZodSchema = CreateCampaignZodSchema.extend({
+export const CreateCampaignWithUserSchema = CreateCampaignSchema.extend({
   user_id: z
     .string()
     .uuid()
     .describe('The ID of the user creating the campaign'),
 });
 
-export type CreateCampaignDto = z.infer<typeof CreateCampaignZodSchema>;
-export type CreateCampaignWithUserDto = z.infer<
-  typeof CreateCampaignWithUserZodSchema
+// Type
+export type TCreateCampaign = z.infer<typeof CreateCampaignSchema>;
+export type TCreateCampaignWithUser = z.infer<
+  typeof CreateCampaignWithUserSchema
 >;
+
+// Dto
+export class CreateCampaignDto extends createZodDto(CreateCampaignSchema) {}
+export class CreateCampaignWithUserDto extends createZodDto(
+  CreateCampaignWithUserSchema,
+) {}

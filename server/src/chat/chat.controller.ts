@@ -2,21 +2,26 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Logger,
   Param,
   Post,
   Req,
   Sse,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
-import { map, type Observable } from 'rxjs';
-import type { CreateCampaignDto } from 'src/campaign/dto/campaign.dto';
-import { ZodPipe } from 'src/pipes/zod.pipe';
-import { type MessageDto, messageZodSchema } from './dto/chat.types';
+import { map, Observable } from 'rxjs';
+import {
+  CreateMessageDto,
+  MessageResponseDto,
+  ThreadDetailDto,
+  ThreadDto,
+} from './dto/chat.dto';
 import { ChatService } from './chat.service';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import type { TAuthenticatedRequest } from 'src/auth/dto/auth.dto';
+import { ZodResponse } from 'nestjs-zod';
+import { ApiProduces } from '@nestjs/swagger';
 
 @Controller('chat')
 @UseGuards(AccessTokenGuard)
@@ -26,11 +31,11 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Post()
-  @UsePipes(new ZodPipe(messageZodSchema))
+  @ZodResponse({ type: MessageResponseDto, status: HttpStatus.CREATED })
   async generateCampaign(
-    @Body() body: MessageDto,
+    @Body() body: CreateMessageDto,
     @Req() req: TAuthenticatedRequest,
-  ): Promise<{ threadId: string; content: CreateCampaignDto | string }> {
+  ) {
     const campaign = await this.chatService.generateCampaign(
       body.content,
       body.thread_id,
@@ -41,11 +46,16 @@ export class ChatController {
 
   @Post('stream')
   @Sse('stream')
-  @UsePipes(new ZodPipe(messageZodSchema))
+  @ZodResponse({
+    type: MessageResponseDto,
+    status: HttpStatus.CREATED,
+    description: 'SSE stream',
+  })
+  @ApiProduces('text/event-stream')
   generateCampaignStream(
-    @Body() body: MessageDto,
+    @Body() body: CreateMessageDto,
     @Req() req: TAuthenticatedRequest,
-  ): Observable<MessageEvent> {
+  ): Observable<MessageEvent<MessageResponseDto | string>> {
     return this.chatService
       .generateCampaignStream(body.content, body.thread_id, req.user.id)
       .pipe(
@@ -64,11 +74,13 @@ export class ChatController {
 
   // todo: add pagination in real world implementation
   @Get('threads')
+  @ZodResponse({ type: [ThreadDto], status: HttpStatus.OK })
   getChatThreadsByUser(@Req() req: TAuthenticatedRequest) {
     return this.chatService.getChatThreads(req.user.id);
   }
 
   @Get('/threads/:threadId')
+  @ZodResponse({ type: ThreadDetailDto, status: HttpStatus.OK })
   getChatThreadById(
     @Param('threadId') threadId: string,
     @Req() req: TAuthenticatedRequest,

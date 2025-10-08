@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Agent, AgentOutputType, handoff, run, tool } from '@openai/agents';
 import {
-  CreateCampaignDto,
-  CreateCampaignZodSchema,
+  TCreateCampaign,
+  CreateCampaignSchema,
 } from '../campaign/dto/campaign.dto';
 import { Observable } from 'rxjs';
 import { StoreService } from 'src/store/store.service';
@@ -16,7 +16,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
 
   private campaignGeneratorAgent: Agent<
     unknown,
-    AgentOutputType<CreateCampaignDto>
+    AgentOutputType<TCreateCampaign>
   >;
 
   private insufficientDataResponderAgent: Agent<
@@ -107,7 +107,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
           },
         }),
       ],
-      outputType: CreateCampaignZodSchema,
+      outputType: CreateCampaignSchema,
       model: 'gpt-5-nano',
       modelSettings: {
         reasoning: {
@@ -144,7 +144,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
   async generateCampaign(
     prompt: string,
     userId: string,
-  ): Promise<CreateCampaignDto | string> {
+  ): Promise<TCreateCampaign | string> {
     this.logger.log(`Generating campaign for prompt: ${prompt}`);
     const result = await run(this.triageAgent, `${prompt}\nUser ID: ${userId}`);
 
@@ -157,7 +157,7 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
         result.finalOutput,
       )}`,
     );
-    return result.finalOutput as CreateCampaignDto;
+    return result.finalOutput as TCreateCampaign;
   }
 
   generateCampaignStream(
