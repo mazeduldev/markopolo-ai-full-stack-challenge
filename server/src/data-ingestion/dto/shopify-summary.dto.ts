@@ -1,6 +1,8 @@
+import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
-const ShopifyProductZodSchema = z.object({
+// Schema
+const ShopifyProductSchema = z.object({
   id: z.string(),
   name: z.string(),
   price: z.number(),
@@ -8,35 +10,40 @@ const ShopifyProductZodSchema = z.object({
   category: z.string(),
 });
 
-const OrdersSummaryZodSchema = z.object({
+const OrdersSummarySchema = z.object({
   total_orders: z.number(),
   total_revenue: z.number(),
   avg_order_value: z.number(),
   repeat_purchase_rate: z.number(),
 });
 
-const CustomersSummaryZodSchema = z.object({
+const CustomersSummarySchema = z.object({
   total_customers: z.number(),
   inactive_60d: z.number(),
   new_last30d: z.number(),
   vip_customers: z.number(),
 });
 
-export const ShopifySummaryZodSchema = z.object({
+export const ShopifySummarySchema = z.object({
   id: z.string().uuid(),
   store_id: z.string().uuid().nullable().optional(),
-  products: z.array(ShopifyProductZodSchema),
-  orders_summary: OrdersSummaryZodSchema,
-  customers_summary: CustomersSummaryZodSchema,
+  products: z.array(ShopifyProductSchema),
+  orders_summary: OrdersSummarySchema,
+  customers_summary: CustomersSummarySchema,
   created_at: z.date(),
 });
 
-export const CreateShopifySummaryZodSchema = ShopifySummaryZodSchema.omit({
+export const CreateShopifySummarySchema = ShopifySummarySchema.omit({
   id: true,
   created_at: true,
 });
 
-export type ShopifySummaryType = z.infer<typeof ShopifySummaryZodSchema>;
-export type CreateShopifySummaryDto = z.infer<
-  typeof CreateShopifySummaryZodSchema
->;
+// Type
+export type TShopifySummaryType = z.infer<typeof ShopifySummarySchema>;
+
+// Dto
+export class CreateShopifySummaryDto extends createZodDto(
+  CreateShopifySummarySchema,
+) {}
+
+export class ShopifySummaryDto extends createZodDto(ShopifySummarySchema) {}

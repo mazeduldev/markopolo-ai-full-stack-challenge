@@ -1,6 +1,8 @@
+import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
-const TrafficSummaryZodSchema = z.object({
+// Schema
+const TrafficSummarySchema = z.object({
   sessions: z.number(),
   page_views: z.number(),
   avg_session_duration_sec: z.number(),
@@ -8,36 +10,43 @@ const TrafficSummaryZodSchema = z.object({
   conversions: z.number(),
 });
 
-const TopPageZodSchema = z.object({
+const TopPageSchema = z.object({
   url: z.string(),
   views: z.number(),
   conversions: z.number(),
 });
 
-const UserDemographicsZodSchema = z.object({
+const UserDemographicsSchema = z.object({
   age_groups: z.record(z.string(), z.number()).nullable(),
   locations: z.record(z.string(), z.number()).nullable(),
   devices: z.record(z.string(), z.number()).nullable(),
 });
 
-export const WebsiteAnalyticsSummaryZodSchema = z.object({
+export const WebsiteAnalyticsSummarySchema = z.object({
   id: z.string().uuid(),
   store_id: z.string().uuid().nullable().optional(),
-  traffic_summary: TrafficSummaryZodSchema,
-  top_pages: z.array(TopPageZodSchema),
-  user_demographics: UserDemographicsZodSchema,
+  traffic_summary: TrafficSummarySchema,
+  top_pages: z.array(TopPageSchema),
+  user_demographics: UserDemographicsSchema,
   created_at: z.date(),
 });
 
-export const CreateWebsiteAnalyticsSummaryZodSchema =
-  WebsiteAnalyticsSummaryZodSchema.omit({
+export const CreateWebsiteAnalyticsSummarySchema =
+  WebsiteAnalyticsSummarySchema.omit({
     id: true,
     created_at: true,
   });
 
-export type WebsiteAnalyticsSummaryType = z.infer<
-  typeof WebsiteAnalyticsSummaryZodSchema
+// Type
+export type TWebsiteAnalyticsSummaryType = z.infer<
+  typeof WebsiteAnalyticsSummarySchema
 >;
-export type CreateWebsiteAnalyticsSummaryDto = z.infer<
-  typeof CreateWebsiteAnalyticsSummaryZodSchema
->;
+
+// Dto
+export class CreateWebsiteAnalyticsSummaryDto extends createZodDto(
+  CreateWebsiteAnalyticsSummarySchema,
+) {}
+
+export class WebsiteAnalyticsSummaryDto extends createZodDto(
+  WebsiteAnalyticsSummarySchema,
+) {}

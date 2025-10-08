@@ -61,17 +61,17 @@ export const DataSourceConnectionViewSchema = z.object({
 });
 
 // Type
-export type CreateDataSourceConnection = z.infer<
+export type TCreateDataSourceConnection = z.infer<
   typeof CreateDataSourceConnectionSchema
 >;
 
-export type UpdateDataSourceConnection = z.infer<
+export type TUpdateDataSourceConnection = z.infer<
   typeof UpdateDataSourceConnectionSchema
 >;
 
-export type DataSourceConnection = z.infer<typeof DataSourceConnectionSchema>;
+export type TDataSourceConnection = z.infer<typeof DataSourceConnectionSchema>;
 
-export type DataSourceConnectionView = z.infer<
+export type TDataSourceConnectionView = z.infer<
   typeof DataSourceConnectionViewSchema
 >;
 

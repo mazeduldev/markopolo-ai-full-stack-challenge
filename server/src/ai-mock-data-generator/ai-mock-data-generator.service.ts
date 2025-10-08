@@ -4,15 +4,15 @@ import { zodTextFormat } from 'openai/helpers/zod';
 import { EDataSourceType } from 'src/data-ingestion/dto/data-source-connection.dto';
 import {
   CreateGoogleAdsSummaryDto,
-  CreateGoogleAdsSummaryZodSchema,
+  CreateGoogleAdsSummarySchema,
 } from 'src/data-ingestion/dto/google-ads-summary.dto';
 import {
   CreateShopifySummaryDto,
-  CreateShopifySummaryZodSchema,
+  CreateShopifySummarySchema,
 } from 'src/data-ingestion/dto/shopify-summary.dto';
 import {
   CreateWebsiteAnalyticsSummaryDto,
-  CreateWebsiteAnalyticsSummaryZodSchema,
+  CreateWebsiteAnalyticsSummarySchema,
 } from 'src/data-ingestion/dto/website-analytics-summary.dto';
 
 /**
@@ -63,10 +63,7 @@ Account Name: ${name}
 Account URL: ${url}
 `,
       text: {
-        format: zodTextFormat(
-          CreateGoogleAdsSummaryZodSchema,
-          'googleAdsSummary',
-        ),
+        format: zodTextFormat(CreateGoogleAdsSummarySchema, 'googleAdsSummary'),
       },
     });
 
@@ -98,7 +95,7 @@ Shop Name: ${name}
 Shop URL: ${url}
 `,
       text: {
-        format: zodTextFormat(CreateShopifySummaryZodSchema, 'shopifySummary'),
+        format: zodTextFormat(CreateShopifySummarySchema, 'shopifySummary'),
       },
     });
 
@@ -131,7 +128,7 @@ Website URL: ${url}
 `,
       text: {
         format: zodTextFormat(
-          CreateWebsiteAnalyticsSummaryZodSchema,
+          CreateWebsiteAnalyticsSummarySchema,
           'websiteAnalyticsSummary',
         ),
       },

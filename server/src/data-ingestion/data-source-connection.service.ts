@@ -12,7 +12,7 @@ import { Repository } from 'typeorm';
 import {
   EConnectionStatus,
   CreateDataSourceConnectionDto,
-  DataSourceConnectionView,
+  TDataSourceConnectionView,
   DataSourceConnectionViewSchema,
   EDataSourceType,
 } from './dto/data-source-connection.dto';
@@ -22,15 +22,15 @@ import { GoogleAdsSummary } from './entities/google-ads-summary.entity';
 import { WebsiteAnalyticsSummary } from './entities/website-analytics-summary.entity';
 import {
   CreateGoogleAdsSummaryDto,
-  CreateGoogleAdsSummaryZodSchema,
+  CreateGoogleAdsSummarySchema,
 } from './dto/google-ads-summary.dto';
 import {
   CreateShopifySummaryDto,
-  CreateShopifySummaryZodSchema,
+  CreateShopifySummarySchema,
 } from './dto/shopify-summary.dto';
 import {
   CreateWebsiteAnalyticsSummaryDto,
-  CreateWebsiteAnalyticsSummaryZodSchema,
+  CreateWebsiteAnalyticsSummarySchema,
 } from './dto/website-analytics-summary.dto';
 import { AiMockDataGeneratorService } from 'src/ai-mock-data-generator/ai-mock-data-generator.service';
 
@@ -115,7 +115,7 @@ export class DataSourceConnectionService {
 
     switch (type) {
       case EDataSourceType.SHOPIFY: {
-        const shopifyData = CreateShopifySummaryZodSchema.parse(dataSummary);
+        const shopifyData = CreateShopifySummarySchema.parse(dataSummary);
         const shopifySummary = this.shopifySummaryRepository.create({
           ...shopifyData,
           store_id: storeId,
@@ -127,8 +127,7 @@ export class DataSourceConnectionService {
         break;
       }
       case EDataSourceType.GOOGLE_ADS: {
-        const googleAdsData =
-          CreateGoogleAdsSummaryZodSchema.parse(dataSummary);
+        const googleAdsData = CreateGoogleAdsSummarySchema.parse(dataSummary);
         const googleAdsSummary = this.googleAdsSummaryRepository.create({
           ...googleAdsData,
           store_id: storeId,
@@ -141,7 +140,7 @@ export class DataSourceConnectionService {
       }
       case EDataSourceType.WEBSITE_ANALYTICS: {
         const websiteAnalyticsData =
-          CreateWebsiteAnalyticsSummaryZodSchema.parse(dataSummary);
+          CreateWebsiteAnalyticsSummarySchema.parse(dataSummary);
         const websiteAnalyticsSummary =
           this.websiteAnalyticsSummaryRepository.create({
             ...websiteAnalyticsData,
@@ -177,7 +176,7 @@ export class DataSourceConnectionService {
     return this.dataSourceConnectionRepository.save(connection);
   }
 
-  async getConnections(userId: string): Promise<DataSourceConnectionView[]> {
+  async getConnections(userId: string): Promise<TDataSourceConnectionView[]> {
     const connections = await this.dataSourceConnectionRepository.find({
       where: { user_id: userId },
     });
@@ -190,7 +189,7 @@ export class DataSourceConnectionService {
   async getConnectionByTypeAndUserId(
     type: EDataSourceType,
     userId: string,
-  ): Promise<DataSourceConnectionView | null> {
+  ): Promise<TDataSourceConnectionView | null> {
     const connection = await this.dataSourceConnectionRepository.findOne({
       where: { type, user_id: userId },
     });

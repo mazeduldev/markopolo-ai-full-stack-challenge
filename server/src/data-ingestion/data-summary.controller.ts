@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  HttpStatus,
   NotFoundException,
   Req,
   UseGuards,
@@ -13,6 +14,11 @@ import {
   EConnectionStatus,
   EDataSourceType,
 } from './dto/data-source-connection.dto';
+import { ZodResponse } from 'nestjs-zod';
+import { GoogleAdsSummaryDto } from './dto/google-ads-summary.dto';
+import { ShopifySummaryDto } from './dto/shopify-summary.dto';
+import { WebsiteAnalyticsSummaryDto } from './dto/website-analytics-summary.dto';
+import { CombinedSummaryDto } from './dto/combined-summary.dto';
 
 @UseGuards(AccessTokenGuard)
 @Controller('data-summary')
@@ -23,6 +29,7 @@ export class DataSummaryController {
   ) {}
 
   @Get('google-ads')
+  @ZodResponse({ type: GoogleAdsSummaryDto, status: HttpStatus.OK })
   async getLatestGoogleAdsSummaryByStore(@Req() req: AuthenticatedRequest) {
     const userId = req.user.id;
     const connection =
@@ -48,6 +55,7 @@ export class DataSummaryController {
   }
 
   @Get('shopify')
+  @ZodResponse({ type: ShopifySummaryDto, status: HttpStatus.OK })
   async getLatestShopifySummaryByStore(@Req() req: AuthenticatedRequest) {
     const userId = req.user.id;
     const connection =
@@ -71,6 +79,7 @@ export class DataSummaryController {
   }
 
   @Get('website-analytics')
+  @ZodResponse({ type: WebsiteAnalyticsSummaryDto, status: HttpStatus.OK })
   async getLatestWebsiteAnalyticsSummaryByStore(
     @Req() req: AuthenticatedRequest,
   ) {
@@ -102,6 +111,7 @@ export class DataSummaryController {
   }
 
   @Get()
+  @ZodResponse({ type: CombinedSummaryDto, status: HttpStatus.OK })
   async getAvailableDataSummaryForStore(@Req() req: AuthenticatedRequest) {
     const userId = req.user.id;
 
