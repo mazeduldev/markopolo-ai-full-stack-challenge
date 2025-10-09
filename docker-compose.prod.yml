@@ -34,6 +34,7 @@ services:
     environment:
       - DB_HOST=postgres
       - PORT=8080
+      - NODE_ENV=production
     ports:
       - "8080:8080"
     depends_on:
@@ -46,6 +47,7 @@ services:
     restart: unless-stopped
     environment:
       - API_URL=http://server:8080
+      - NODE_ENV=production
     ports:
       - "3000:3000"
     depends_on:
