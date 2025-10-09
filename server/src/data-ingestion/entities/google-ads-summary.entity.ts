@@ -1,4 +1,4 @@
-import { Store } from 'src/store/entities/store.entity';
+import type { Store } from 'src/store/entities/store.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,6 +6,7 @@ import {
   Column,
   CreateDateColumn,
   JoinColumn,
+  type Relation,
 } from 'typeorm';
 
 @Entity('google_ads_summaries')
@@ -13,11 +14,11 @@ export class GoogleAdsSummary {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Store, (store) => store.google_ads_summaries, {
+  @ManyToOne('Store', (store: Store) => store.google_ads_summaries, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'store_id' })
-  store: Store;
+  store: Relation<Store>;
 
   @Column()
   store_id: string;

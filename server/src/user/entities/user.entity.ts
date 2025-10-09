@@ -1,7 +1,8 @@
-import { Campaign } from 'src/campaign/entities/campaign.entity';
-import { ChatThread } from 'src/chat/entities/chat-thread.entity';
-import { DataSourceConnection } from 'src/data-ingestion/entities/data-source-connection.entity';
-import { Secret } from 'src/auth/entities/secret.entity';
+import type { Campaign } from 'src/campaign/entities/campaign.entity';
+import type { ChatThread } from 'src/chat/entities/chat-thread.entity';
+import type { DataSourceConnection } from 'src/data-ingestion/entities/data-source-connection.entity';
+import type { Secret } from 'src/auth/entities/secret.entity';
+import type { Store } from 'src/store/entities/store.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -11,8 +12,8 @@ import {
   OneToMany,
   OneToOne,
   JoinColumn,
+  type Relation,
 } from 'typeorm';
-import { Store } from 'src/store/entities/store.entity';
 
 @Entity('users')
 export class User {
@@ -22,11 +23,11 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @OneToOne(() => Secret, (secret) => secret.user, {
+  @OneToOne('Secret', (secret: Secret) => secret.user, {
     cascade: true,
   })
   @JoinColumn({ name: 'secret_id' })
-  secret: Secret;
+  secret: Relation<Secret>;
 
   @Column()
   secret_id: string;
@@ -40,21 +41,24 @@ export class User {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => Campaign, (campaign) => campaign.user)
-  campaigns: Campaign[];
+  @OneToMany('Campaign', (campaign: Campaign) => campaign.user)
+  campaigns: Relation<Campaign[]>;
 
-  @OneToMany(() => ChatThread, (thread) => thread.user)
-  chat_threads: ChatThread[];
+  @OneToMany('ChatThread', (thread: ChatThread) => thread.user)
+  chat_threads: Relation<ChatThread[]>;
 
-  @OneToMany(() => DataSourceConnection, (connection) => connection.user)
-  data_source_connections: DataSourceConnection[];
+  @OneToMany(
+    'DataSourceConnection',
+    (connection: DataSourceConnection) => connection.user,
+  )
+  data_source_connections: Relation<any[]>;
 
-  @OneToOne(() => Store, (store) => store.user, {
+  @OneToOne('Store', (store: Store) => store.user, {
     cascade: true,
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'store_id' })
-  store: Store;
+  store: Relation<Store>;
 
   @Column({ nullable: true })
   store_id: string;

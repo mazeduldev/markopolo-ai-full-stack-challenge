@@ -6,8 +6,9 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  type Relation,
 } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
+import type { User } from 'src/user/entities/user.entity';
 import {
   EConnectionStatus,
   EDataSourceType,
@@ -58,11 +59,11 @@ export class DataSourceConnection {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.data_source_connections, {
+  @ManyToOne('User', (user: User) => user.data_source_connections, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: Relation<User>;
 
   @Column()
   user_id: string;

@@ -4,9 +4,10 @@ import {
   Entity,
   OneToOne,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
+import type { User } from 'src/user/entities/user.entity';
 
 @Entity('secrets')
 export class Secret {
@@ -22,6 +23,6 @@ export class Secret {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToOne(() => User, (user) => user.secret)
-  user: User;
+  @OneToOne('User', (user: User) => user.secret)
+  user: Relation<User>;
 }

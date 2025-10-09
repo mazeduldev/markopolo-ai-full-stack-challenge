@@ -8,9 +8,10 @@ import {
   JoinColumn,
   OneToMany,
   Index,
+  type Relation,
 } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { ChatMessage } from './chat-message.entity';
+import type { User } from 'src/user/entities/user.entity';
+import type { ChatMessage } from './chat-message.entity';
 
 @Entity('chat_threads')
 @Index(['user_id', 'created_at'])
@@ -27,13 +28,13 @@ export class ChatThread {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.chat_threads)
+  @ManyToOne('User', (user: User) => user.chat_threads)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: Relation<User>;
 
   @Column()
   user_id: string;
 
-  @OneToMany(() => ChatMessage, (message) => message.thread)
-  messages: ChatMessage[];
+  @OneToMany('ChatMessage', (message: ChatMessage) => message.thread)
+  messages: Relation<ChatMessage[]>;
 }

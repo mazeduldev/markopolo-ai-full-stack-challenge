@@ -6,8 +6,9 @@ import {
   ManyToOne,
   JoinColumn,
   Index,
+  type Relation,
 } from 'typeorm';
-import { ChatThread } from './chat-thread.entity';
+import type { ChatThread } from './chat-thread.entity';
 
 export enum MessageRole {
   USER = 'user',
@@ -36,11 +37,11 @@ export class ChatMessage {
   @CreateDateColumn()
   created_at: Date;
 
-  @ManyToOne(() => ChatThread, (thread) => thread.messages, {
+  @ManyToOne('ChatThread', (thread: ChatThread) => thread.messages, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'thread_id' })
-  thread: ChatThread;
+  thread: Relation<ChatThread>;
 
   @Column()
   thread_id: string;

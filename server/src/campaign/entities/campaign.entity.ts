@@ -7,8 +7,9 @@ import {
   ManyToOne,
   JoinColumn,
   Index,
+  type Relation,
 } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
+import type { User } from 'src/user/entities/user.entity';
 import { EChannelType } from '../dto/campaign.dto';
 
 @Entity('campaigns')
@@ -63,9 +64,9 @@ export class Campaign {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.campaigns, { nullable: true })
+  @ManyToOne('User', (user: User) => user.campaigns, { nullable: true })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: Relation<User>;
 
   @Column({ nullable: true })
   user_id: string;

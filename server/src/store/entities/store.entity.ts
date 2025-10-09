@@ -6,28 +6,32 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
+  type Relation,
 } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { GoogleAdsSummary } from 'src/data-ingestion/entities/google-ads-summary.entity';
-import { ShopifySummary } from 'src/data-ingestion/entities/shopify-summary.entity';
-import { WebsiteAnalyticsSummary } from 'src/data-ingestion/entities/website-analytics-summary.entity';
+import type { User } from 'src/user/entities/user.entity';
+import type { GoogleAdsSummary } from 'src/data-ingestion/entities/google-ads-summary.entity';
+import type { ShopifySummary } from 'src/data-ingestion/entities/shopify-summary.entity';
+import type { WebsiteAnalyticsSummary } from 'src/data-ingestion/entities/website-analytics-summary.entity';
 
 @Entity('stores')
 export class Store {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => User, (user) => user.store)
-  user: User;
+  @OneToOne('User', (user: User) => user.store)
+  user: Relation<User>;
 
-  @OneToMany(() => GoogleAdsSummary, (summary) => summary.store)
-  google_ads_summaries: GoogleAdsSummary[];
+  @OneToMany('GoogleAdsSummary', (summary: GoogleAdsSummary) => summary.store)
+  google_ads_summaries: Relation<GoogleAdsSummary[]>;
 
-  @OneToMany(() => ShopifySummary, (summary) => summary.store)
-  shopify_summaries: ShopifySummary[];
+  @OneToMany('ShopifySummary', (summary: ShopifySummary) => summary.store)
+  shopify_summaries: Relation<ShopifySummary[]>;
 
-  @OneToMany(() => WebsiteAnalyticsSummary, (summary) => summary.store)
-  website_analytics_summaries: WebsiteAnalyticsSummary[];
+  @OneToMany(
+    'WebsiteAnalyticsSummary',
+    (summary: WebsiteAnalyticsSummary) => summary.store,
+  )
+  website_analytics_summaries: Relation<WebsiteAnalyticsSummary[]>;
 
   @Column()
   user_id: string;
