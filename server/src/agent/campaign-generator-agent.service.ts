@@ -178,13 +178,13 @@ export class CampaignGeneratorAgentService implements OnModuleInit {
           );
 
           this.logger.log(`Last Agent: ${stream.lastAgent?.name}`);
-          this.logger.log(`Final Output: ${stream.finalOutput as string}`);
           const textStream = stream.toTextStream();
 
           for await (const chunk of textStream) {
             observer.next({ data: chunk });
           }
 
+          this.logger.log(`Final Output: ${stream.finalOutput as string}`);
           observer.complete();
         } catch (error) {
           observer.error(error);
