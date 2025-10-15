@@ -21,7 +21,11 @@ import { ChatService } from './chat.service';
 import { AccessTokenGuard } from 'src/auth/passport/access-token.guard';
 import type { TAuthenticatedRequest } from 'src/auth/dto/auth.dto';
 import { ZodResponse } from 'nestjs-zod';
-import { ApiBearerAuth, ApiProduces } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiProduces,
+} from '@nestjs/swagger';
 
 @Controller('chat')
 @ApiBearerAuth('access-token')
@@ -47,16 +51,14 @@ export class ChatController {
 
   @Post('stream')
   @Sse('stream')
-  @ZodResponse({
+  @ApiCreatedResponse({
     type: MessageResponseDto,
-    status: HttpStatus.CREATED,
-    description: 'SSE stream',
   })
   @ApiProduces('text/event-stream')
   generateCampaignStream(
     @Body() body: CreateMessageDto,
     @Req() req: TAuthenticatedRequest,
-  ): Observable<MessageEvent<MessageResponseDto | string>> {
+  ): Observable<MessageEvent<MessageResponseDto>> {
     return this.chatService
       .generateCampaignStream(body.content, body.thread_id, req.user.id)
       .pipe(

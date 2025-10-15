@@ -18,7 +18,7 @@ export const MessageSchema = CreateMessageSchema.extend({
 
 export const MessageResponseSchema = z.object({
   threadId: z.string().uuid(),
-  content: z.string().or(CreateCampaignSchema.or(z.string())),
+  chunk: z.string().or(CreateCampaignSchema.or(z.string())),
 });
 
 export const ThreadSchema = z.object({
