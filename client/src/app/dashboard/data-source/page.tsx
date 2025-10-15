@@ -36,6 +36,7 @@ import {
 import { toast } from "sonner";
 import { DataSummary } from "@/components/data-summary/DataSummary";
 import { DataSummaryResponse } from "@/types/data-summary";
+import { PageHeader } from "@/components/custom-ui/PageHeader";
 
 interface DataSourceConnection {
   id: string;
@@ -539,10 +540,7 @@ export default function DataSource() {
 
   return (
     <div className="space-y-6 flex flex-col flex-1 h-full">
-      <div className="flex items-center space-x-2">
-        <Database className="w-8 h-8" />
-        <h1 className="text-3xl font-bold">Data Sources</h1>
-      </div>
+      <PageHeader icon={Database} title="Data Sources" />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {dataSourceTypes.map((source) => {

@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { CreateStoreDtoType, ShopDto } from "@/types/shop.type";
+import { PageHeader } from "@/components/custom-ui/PageHeader";
 
 interface UpdateShopData {
   name?: string;
@@ -304,10 +305,7 @@ export default function Shop() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <Store className="w-8 h-8" />
-        <h1 className="text-3xl font-bold">Shop Settings</h1>
-      </div>
+      <PageHeader icon={Store} title="Shop Settings" />
 
       <Card>
         <CardHeader>

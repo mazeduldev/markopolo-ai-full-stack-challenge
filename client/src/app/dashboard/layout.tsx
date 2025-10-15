@@ -9,6 +9,7 @@ import {
   MessagesSquare,
   Store,
   Database,
+  Menu,
 } from "lucide-react";
 import {
   Sidebar,
@@ -22,6 +23,8 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarSeparator,
+  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -34,6 +37,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThreadList } from "@/components/chat-history/ThreadList";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { MenuTrigger } from "@/components/custom-ui/MenuTrigger";
 
 const navItems = [
   {
@@ -57,10 +64,11 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
   const pathname = usePathname();
   const { user } = useUser();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon">
+      <Sidebar collapsible="offcanvas">
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -163,7 +171,18 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
-      <main className="flex-1 py-6 px-10 h-svh">{children}</main>
+      <div className="flex flex-col flex-1 bg-sidebar">
+        {isMobile && (
+          <div className="flex flex-row p-2 border-b-1">
+            <MenuTrigger />
+          </div>
+        )}
+        <main
+          className={cn("flex-1 py-6 px-10 h-svh", isMobile && "py-3 px-5")}
+        >
+          {children}
+        </main>
+      </div>
     </SidebarProvider>
   );
 }

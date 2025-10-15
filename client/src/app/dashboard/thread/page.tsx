@@ -18,6 +18,7 @@ import {
   StreamMessage,
 } from "@/types/chat-thread.type";
 import { CampaignView } from "@/components/chat-history/CampaignView";
+import { PageHeader } from "@/components/custom-ui/PageHeader";
 
 // A component to display while the client component is loading
 function ThreadPageSkeleton() {
@@ -277,14 +278,10 @@ function ThreadPageContent() {
   return (
     <div className="flex flex-col flex-1 h-full space-y-6">
       {/* Header */}
-      <div className="bg-background">
-        <div className="flex items-center gap-2">
-          <MessagesSquare className="w-8 h-8 shrink-0" />
-          <h1 className="text-3xl font-bold">
-            {threadData?.title || "New Chat"}
-          </h1>
-        </div>
-      </div>
+      <PageHeader
+        icon={MessagesSquare}
+        title={threadData?.title || "New Chat"}
+      />
 
       {/* Messages */}
       <ScrollArea className="flex-1 p-4 border rounded-xl h-[500]">
@@ -367,7 +364,7 @@ function ThreadPageContent() {
             onClick={handleSendMessage}
             disabled={!currentMessage.trim() || isStreaming}
             size="lg"
-            className="h-[60px] px-6"
+            className="h-auto px-6"
           >
             <Send className="w-4 h-4" />
           </Button>
